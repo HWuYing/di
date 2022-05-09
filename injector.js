@@ -1,21 +1,24 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StaticInjector = exports.__USECLASS__ = exports.__PROVIDER_TYPE__ = exports.__PROVIDE__INJECT__ = void 0;
 /* eslint-disable no-use-before-define */
 /* eslint-disable camelcase */
-import 'reflect-metadata';
-import { isUndefined } from 'lodash';
-import { Injector } from './injector.abstract';
+require("reflect-metadata");
+const lodash_1 = require("lodash");
+const injector_abstract_1 = require("./injector.abstract");
 const reflect = typeof global === "object" ? global.Reflect : typeof self === "object" ? self.Reflect : Reflect;
 const designParamtypes = `design:paramtypes`;
-export const __PROVIDE__INJECT__ = `design:__provide__inject__`;
-export const __PROVIDER_TYPE__ = '__PROVIDER_TYPE__';
-export const __USECLASS__ = '__USECLASS__';
-export class StaticInjector {
+exports.__PROVIDE__INJECT__ = `design:__provide__inject__`;
+exports.__PROVIDER_TYPE__ = '__PROVIDER_TYPE__';
+exports.__USECLASS__ = '__USECLASS__';
+class StaticInjector {
     parentInjector;
     isSelfContext = false;
     _recors = new Map();
     _instanceRecors = new Map();
     constructor(parentInjector, options) {
         this.parentInjector = parentInjector;
-        this._recors.set(Injector, { token: Injector, fn: () => this });
+        this._recors.set(injector_abstract_1.Injector, { token: injector_abstract_1.Injector, fn: () => this });
         this.isSelfContext = options ? options.isScope === 'self' : false;
     }
     get(token, ...params) {
@@ -26,7 +29,7 @@ export class StaticInjector {
         const { provide, useClass, useValue, useFactory } = provider;
         const record = this._recors.get(token) || {};
         record.token = provide;
-        if (!isUndefined(useValue)) {
+        if (!(0, lodash_1.isUndefined)(useValue)) {
             record.fn = resolveMulitProvider.call(this, provider, record);
         }
         else if (useClass) {
@@ -40,7 +43,7 @@ export class StaticInjector {
     }
     createClass(clazz) {
         const deps = reflect.getMetadata(designParamtypes, clazz) || [];
-        const injectTypes = clazz[__PROVIDE__INJECT__] || [];
+        const injectTypes = clazz[exports.__PROVIDE__INJECT__] || [];
         const arvgs = deps.map((token) => this.get(token));
         injectTypes.forEach(({ token, index }) => arvgs[index] = this.get(token));
         return new clazz(...arvgs);
@@ -51,6 +54,7 @@ export class StaticInjector {
         this.parentInjector = void (0);
     }
 }
+exports.StaticInjector = StaticInjector;
 function resolveClassProvider({ useNew = false, useClass }) {
     let instance;
     return function () {

@@ -1,4 +1,7 @@
-export class InjectorToken {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InjectorToken = void 0;
+class InjectorToken {
     _desc;
     static get(_desc) {
         return new InjectorToken(_desc);
@@ -10,3 +13,4 @@ export class InjectorToken {
         return `Token ${this._desc}`;
     }
 }
+exports.InjectorToken = InjectorToken;

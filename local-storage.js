@@ -1,6 +1,9 @@
-import { __decorate, __metadata } from "tslib";
-import { Injectable } from "./injectable";
-import { Injector } from "./injector.abstract";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LocatorStorage = void 0;
+const tslib_1 = require("tslib");
+const injectable_1 = require("./injectable");
+const injector_abstract_1 = require("./injector.abstract");
 let LocatorStorage = class LocatorStorage {
     injector;
     constructor(injector) {
@@ -13,8 +16,8 @@ let LocatorStorage = class LocatorStorage {
         return this.injector.get(target);
     }
 };
-LocatorStorage = __decorate([
-    Injectable(),
-    __metadata("design:paramtypes", [Injector])
+LocatorStorage = tslib_1.__decorate([
+    (0, injectable_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [injector_abstract_1.Injector])
 ], LocatorStorage);
-export { LocatorStorage };
+exports.LocatorStorage = LocatorStorage;
