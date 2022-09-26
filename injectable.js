@@ -12,7 +12,6 @@ const InjectableFactory = (defaultToken, defaultOptions) => (token, options) => 
     }
     const { injector: _injector = injector, ..._options } = options || {};
     const providers = [token, defaultToken, target].filter((item) => !!item);
-    target[injector_1.__PROVIDER_TYPE__] = injector_1.__USECLASS__;
     providers.forEach((provide) => _injector.set(provide, { ...defaultOptions, ..._options, provide, useClass: target }));
     return target;
 };

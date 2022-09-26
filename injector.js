@@ -1,16 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StaticInjector = exports.__USECLASS__ = exports.__PROVIDER_TYPE__ = exports.__PROVIDE__INJECT__ = void 0;
+exports.StaticInjector = exports.__PROVIDE__INJECT__ = void 0;
 /* eslint-disable no-use-before-define */
-/* eslint-disable camelcase */
 require("reflect-metadata");
 const lodash_1 = require("lodash");
 const injector_abstract_1 = require("./injector.abstract");
 const reflect = typeof global === "object" ? global.Reflect : typeof self === "object" ? self.Reflect : Reflect;
 const designParamtypes = `design:paramtypes`;
 exports.__PROVIDE__INJECT__ = `design:__provide__inject__`;
-exports.__PROVIDER_TYPE__ = '__PROVIDER_TYPE__';
-exports.__USECLASS__ = '__USECLASS__';
 class StaticInjector {
     parentInjector;
     isSelfContext = false;
@@ -73,7 +70,6 @@ function resolveMulitProvider({ useValue, multi }, { fn = () => [] }) {
 }
 function resolveFactoryProvider({ useFactory, deps = [] }) {
     return function (...params) {
-        // eslint-disable-next-line prefer-spread
         return useFactory.apply(undefined, [...deps.map((token) => this.get(token)), ...params]);
     };
 }
