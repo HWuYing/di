@@ -1,10 +1,11 @@
-export declare const Type: FunctionConstructor;
-export declare interface TypeClass<T = any> {
+import { InjectorToken } from './injector-token';
+declare interface TypeClass {
     [x: string]: any;
 }
 export declare interface Type<T = any> extends Function {
     new (...args: any[]): T;
 }
+export declare type TokenKey = TypeClass | InjectorToken | Function;
 interface AbstractProvider {
     provide: any;
     deps?: any[];

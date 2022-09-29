@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { Injector } from './injector.abstract';
-import { InjectorToken } from './injector-token';
-import { Provider, Type, TypeClass } from './type-api';
+import { Provider, TokenKey, Type } from './type-api';
 export declare const __PROVIDE__INJECT__ = "design:__provide__inject__";
 export declare class StaticInjector implements Injector {
     protected parentInjector?: Injector;
@@ -11,7 +10,7 @@ export declare class StaticInjector implements Injector {
     constructor(parentInjector?: Injector, options?: {
         [key: string]: any;
     });
-    get<T>(token: Type<T> | TypeClass | InjectorToken, ...params: any[]): T;
+    get<T>(token: Type<T> | TokenKey, ...params: any[]): T;
     set(token: any, provider: Provider): void;
     createClass<T = any>(clazz: Type<T>): T;
     clear(): void;
