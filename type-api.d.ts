@@ -1,4 +1,10 @@
-export declare type Type<T = any> = new (...args: any[]) => T;
+export declare const Type: FunctionConstructor;
+export declare interface TypeClass<T = any> {
+    [x: string]: any;
+}
+export declare interface Type<T = any> extends Function {
+    new (...args: any[]): T;
+}
 interface AbstractProvider {
     provide: any;
     deps?: any[];
