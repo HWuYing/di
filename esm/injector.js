@@ -6,17 +6,17 @@ const reflect = typeof global === "object" ? global.Reflect : typeof self === "o
 const designParamtypes = `design:paramtypes`;
 export const __PROVIDE__INJECT__ = `design:__provide__inject__`;
 export class StaticInjector {
-    parentInjector;
-    isSelfContext = false;
-    _recors = new Map();
-    _instanceRecors = new Map();
     constructor(parentInjector, options) {
         this.parentInjector = parentInjector;
+        this.isSelfContext = false;
+        this._recors = new Map();
+        this._instanceRecors = new Map();
         this._recors.set(Injector, { token: Injector, fn: () => this });
         this.isSelfContext = options ? options.isScope === 'self' : false;
     }
     get(token, ...params) {
-        const record = this._recors.get(token) || this.parentInjector?._recors.get(token);
+        var _a;
+        const record = this._recors.get(token) || ((_a = this.parentInjector) === null || _a === void 0 ? void 0 : _a._recors.get(token));
         return record ? record.fn.apply(this, params) : null;
     }
     set(token, provider) {

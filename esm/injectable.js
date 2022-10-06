@@ -1,3 +1,4 @@
+import { __rest } from "tslib";
 import { __PROVIDE__INJECT__, StaticInjector } from './injector';
 import { InjectorToken } from './injector-token';
 const injector = new StaticInjector();
@@ -7,9 +8,9 @@ const InjectableFactory = (defaultToken, defaultOptions) => (token, options) => 
         token = void (0);
         options = token;
     }
-    const { injector: _injector = injector, ..._options } = options || {};
+    const _a = options || {}, { injector: _injector = injector } = _a, _options = __rest(_a, ["injector"]);
     const providers = [token, defaultToken, target].filter((item) => !!item);
-    providers.forEach((provide) => _injector.set(provide, { ...defaultOptions, ..._options, provide, useClass: target }));
+    providers.forEach((provide) => _injector.set(provide, Object.assign(Object.assign(Object.assign({}, defaultOptions), _options), { provide, useClass: target })));
     return target;
 };
 export const Inject = (token) => (target, name, index) => {
