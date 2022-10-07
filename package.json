@@ -1,13 +1,22 @@
 {
-  "name": "@fm/di",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./cjs/index.js",
-  "module": "./esm5/index.js",
-  "es2015": "./esm/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+	"name": "@fm/di",
+	"version": "1.0.0",
+	"description": "",
+	"main": "./cjs/index.js",
+	"module": "./esm5/index.js",
+	"es2015": "./esm/index.js",
+	"exports": {
+		".": {
+			"node": "./cjs/index.js",
+			"require": "./cjs/index.js",
+			"es2015": "./esm/index.js",
+			"default": "./esm5/index.js"
+		}
+	},
+	"dependencies": {},
+	"scripts": {
+		"test": "echo 'Error: no test specified' && exit 1"
+	},
+	"author": "",
+	"license": "ISC"
 }
