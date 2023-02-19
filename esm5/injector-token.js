@@ -11,3 +11,5 @@ var InjectorToken = /** @class */ (function () {
     return InjectorToken;
 }());
 export { InjectorToken };
+export var INJECTOR = InjectorToken.get('INJECTOR');
+export var INJECTOR_SCOPE = InjectorToken.get('INJECTOR_SCOPE');

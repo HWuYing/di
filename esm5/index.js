@@ -1,4 +1,6 @@
-export { Inject, Injectable, getProvider, registryProvider } from './injectable';
-export { StaticInjector } from './injector';
+export { makeDecorator, makeMethodDecorator, makeParamDecorator } from './decorators';
+export { INJECTOR_PROV_DEF, setInjectableDef } from './def';
+export { Inject, Injectable } from './injectable';
 export { Injector } from './injector.abstract';
-export { InjectorToken } from './injector-token';
+export { INJECTOR_SCOPE, InjectorToken } from './injector-token';
+export { covertToFactory } from './util';

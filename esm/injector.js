@@ -1,71 +1,83 @@
-/* eslint-disable no-use-before-define */
-import 'reflect-metadata';
-import { isUndefined } from 'lodash';
-import { Injector } from './injector.abstract';
-const reflect = typeof global === "object" ? global.Reflect : typeof self === "object" ? self.Reflect : Reflect;
-const designParamtypes = `design:paramtypes`;
-export const __PROVIDE__INJECT__ = `design:__provide__inject__`;
+import { getInjectableDef } from './def';
+import { injectArgs, saveCurrentInjector } from './injector_compatibility';
+import { INJECTOR, INJECTOR_SCOPE } from './injector-token';
+import { covertToFactory } from './util';
+const NOT_YES = {};
+function makeRecord(factory, value = NOT_YES, multi = false) {
+    return { factory, value, multi: multi ? [] : undefined };
+}
+function checkInjectableScope(scope, def) {
+    const { providedIn } = def;
+    return providedIn && (def.providedIn === scope || providedIn === 'any');
+}
+function deepForEach(input, fn) {
+    input.forEach(value => Array.isArray(value) ? deepForEach(value, fn) : fn(value));
+}
 export class StaticInjector {
-    constructor(parentInjector, options) {
-        this.parentInjector = parentInjector;
-        this.isSelfContext = false;
-        this._recors = new Map();
-        this._instanceRecors = new Map();
-        this._recors.set(Injector, { token: Injector, fn: () => this });
-        this.isSelfContext = options ? options.isScope === 'self' : false;
+    constructor(additionalProviders, parent) {
+        this.parent = parent;
+        this._destroyed = false;
+        this.onDestroy = new Set();
+        this.records = new Map();
+        deepForEach(additionalProviders || [], (provider) => this.set(typeof provider === 'function' ? provider : provider.provide, provider));
+        this.records.set(INJECTOR, makeRecord(() => this));
+        const record = this.records.get(INJECTOR_SCOPE);
+        this.scope = (record === null || record === void 0 ? void 0 : record.factory) ? record.factory() : null;
     }
-    get(token, ...params) {
+    get destroyed() {
+        return this._destroyed;
+    }
+    get(token) {
         var _a;
-        const record = this._recors.get(token) || ((_a = this.parentInjector) === null || _a === void 0 ? void 0 : _a._recors.get(token));
-        return record ? record.fn.apply(this, params) : null;
+        const reInjector = saveCurrentInjector(this);
+        try {
+            if (this.destroyed) {
+                return null;
+            }
+            let record = this.records.get(token);
+            if (!record) {
+                const def = getInjectableDef(token);
+                record = def && checkInjectableScope(this.scope, def) ? makeRecord(def.factory) : null;
+                this.records.set(token, record || null);
+            }
+            return record !== null ? this.hydrate(token, record) : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token);
+        }
+        finally {
+            saveCurrentInjector(reInjector);
+        }
     }
     set(token, provider) {
-        const { provide, useClass, useValue, useFactory } = provider;
-        const record = this._recors.get(token) || {};
-        record.token = provide;
-        if (!isUndefined(useValue)) {
-            record.fn = resolveMulitProvider.call(this, provider, record);
+        const record = makeRecord(covertToFactory(token, provider));
+        if (provider.multi) {
+            let multiRecord = this.records.get(token);
+            if (!multiRecord) {
+                multiRecord = makeRecord(() => injectArgs(multiRecord.multi), NOT_YES, true);
+                this.records.set(token, multiRecord);
+            }
+            token = provider;
+            multiRecord.multi.push(provider);
         }
-        else if (useClass) {
-            const recordClass = this._recors.get(useClass) || { fn: resolveClassProvider.call(this, provider) };
-            record.fn = recordClass.fn;
-        }
-        else if (useFactory) {
-            record.fn = resolveFactoryProvider.call(this, provider);
-        }
-        this._recors.set(record.token, record);
+        this.records.set(token, record);
     }
-    createClass(clazz) {
-        const deps = reflect.getMetadata(designParamtypes, clazz) || [];
-        const injectTypes = clazz[__PROVIDE__INJECT__] || [];
-        const arvgs = deps.map((token) => this.get(token));
-        injectTypes.forEach(({ token, index }) => arvgs[index] = this.get(token));
-        return new clazz(...arvgs);
+    destory() {
+        this._destroyed = true;
+        this.parent = void (0);
+        !this._destroyed && this.onDestroy.forEach((service) => service.destory());
+        this.records.clear();
     }
-    clear() {
-        this._recors.clear();
-        this._instanceRecors.clear();
-        this.parentInjector = void (0);
+    hydrate(token, record) {
+        if (record.value === NOT_YES) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            record.value = record.factory();
+        }
+        if (typeof record.value === 'object' &&
+            record.value.destory &&
+            !(record.value instanceof StaticInjector)) {
+            this.onDestroy.add(record.value);
+        }
+        return record.value;
     }
 }
-function resolveClassProvider({ useNew = false, useClass }) {
-    let instance;
-    return function () {
-        const isSelfContext = this.isSelfContext;
-        let newInstance = isSelfContext ? this._instanceRecors.get(useClass) : instance;
-        if (useNew || !newInstance) {
-            newInstance = this.createClass(useClass);
-            isSelfContext ? this._instanceRecors.set(useClass, newInstance) : instance = newInstance;
-        }
-        return newInstance;
-    };
-}
-function resolveMulitProvider({ useValue, multi }, { fn = () => [] }) {
-    const preValue = fn.call(this);
-    return () => multi ? [...preValue, useValue] : useValue;
-}
-function resolveFactoryProvider({ useFactory, deps = [] }) {
-    return function (...params) {
-        return useFactory.apply(undefined, [...deps.map((token) => this.get(token)), ...params]);
-    };
+export function createInjector(providers, parent) {
+    return new StaticInjector(providers, parent);
 }

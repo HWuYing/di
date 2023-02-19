@@ -4,3 +4,5 @@ export declare class InjectorToken {
     constructor(_desc: string);
     toString(): string;
 }
+export declare const INJECTOR: InjectorToken;
+export declare const INJECTOR_SCOPE: InjectorToken;

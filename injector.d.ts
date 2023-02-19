@@ -1,17 +1,16 @@
-import 'reflect-metadata';
 import { Injector } from './injector.abstract';
 import { Provider, TokenKey, Type } from './type-api';
-export declare const __PROVIDE__INJECT__ = "design:__provide__inject__";
-export declare class StaticInjector implements Injector {
-    protected parentInjector?: Injector;
-    protected isSelfContext: boolean;
-    private _recors;
-    protected _instanceRecors: Map<any, Type>;
-    constructor(parentInjector?: Injector, options?: {
-        [key: string]: any;
-    });
-    get<T>(token: Type<T> | TokenKey, ...params: any[]): T;
+export declare class StaticInjector {
+    protected parent?: Injector;
+    private scope;
+    private _destroyed;
+    get destroyed(): boolean;
+    private onDestroy;
+    private records;
+    constructor(additionalProviders?: Provider[] | null, parent?: Injector);
+    get<T>(token: Type<T> | TokenKey): T;
     set(token: any, provider: Provider): void;
-    createClass<T = any>(clazz: Type<T>): T;
-    clear(): void;
+    destory(): void;
+    private hydrate;
 }
+export declare function createInjector(providers?: Provider[] | null, parent?: Injector): StaticInjector;

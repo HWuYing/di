@@ -9,3 +9,5 @@ export class InjectorToken {
         return `Token ${this._desc}`;
     }
 }
+export const INJECTOR = InjectorToken.get('INJECTOR');
+export const INJECTOR_SCOPE = InjectorToken.get('INJECTOR_SCOPE');

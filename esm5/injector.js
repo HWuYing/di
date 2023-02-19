@@ -1,92 +1,92 @@
-import { __spreadArray } from "tslib";
-/* eslint-disable no-use-before-define */
-import 'reflect-metadata';
-import { isUndefined } from 'lodash';
-import { Injector } from './injector.abstract';
-var reflect = typeof global === "object" ? global.Reflect : typeof self === "object" ? self.Reflect : Reflect;
-var designParamtypes = "design:paramtypes";
-export var __PROVIDE__INJECT__ = "design:__provide__inject__";
+import { getInjectableDef } from './def';
+import { injectArgs, saveCurrentInjector } from './injector_compatibility';
+import { INJECTOR, INJECTOR_SCOPE } from './injector-token';
+import { covertToFactory } from './util';
+var NOT_YES = {};
+function makeRecord(factory, value, multi) {
+    if (value === void 0) { value = NOT_YES; }
+    if (multi === void 0) { multi = false; }
+    return { factory: factory, value: value, multi: multi ? [] : undefined };
+}
+function checkInjectableScope(scope, def) {
+    var providedIn = def.providedIn;
+    return providedIn && (def.providedIn === scope || providedIn === 'any');
+}
+function deepForEach(input, fn) {
+    input.forEach(function (value) { return Array.isArray(value) ? deepForEach(value, fn) : fn(value); });
+}
 var StaticInjector = /** @class */ (function () {
-    function StaticInjector(parentInjector, options) {
+    function StaticInjector(additionalProviders, parent) {
         var _this = this;
-        this.parentInjector = parentInjector;
-        this.isSelfContext = false;
-        this._recors = new Map();
-        this._instanceRecors = new Map();
-        this._recors.set(Injector, { token: Injector, fn: function () { return _this; } });
-        this.isSelfContext = options ? options.isScope === 'self' : false;
+        this.parent = parent;
+        this._destroyed = false;
+        this.onDestroy = new Set();
+        this.records = new Map();
+        deepForEach(additionalProviders || [], function (provider) { return _this.set(typeof provider === 'function' ? provider : provider.provide, provider); });
+        this.records.set(INJECTOR, makeRecord(function () { return _this; }));
+        var record = this.records.get(INJECTOR_SCOPE);
+        this.scope = (record === null || record === void 0 ? void 0 : record.factory) ? record.factory() : null;
     }
+    Object.defineProperty(StaticInjector.prototype, "destroyed", {
+        get: function () {
+            return this._destroyed;
+        },
+        enumerable: false,
+        configurable: true
+    });
     StaticInjector.prototype.get = function (token) {
         var _a;
-        var params = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            params[_i - 1] = arguments[_i];
+        var reInjector = saveCurrentInjector(this);
+        try {
+            if (this.destroyed) {
+                return null;
+            }
+            var record = this.records.get(token);
+            if (!record) {
+                var def = getInjectableDef(token);
+                record = def && checkInjectableScope(this.scope, def) ? makeRecord(def.factory) : null;
+                this.records.set(token, record || null);
+            }
+            return record !== null ? this.hydrate(token, record) : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token);
         }
-        var record = this._recors.get(token) || ((_a = this.parentInjector) === null || _a === void 0 ? void 0 : _a._recors.get(token));
-        return record ? record.fn.apply(this, params) : null;
+        finally {
+            saveCurrentInjector(reInjector);
+        }
     };
     StaticInjector.prototype.set = function (token, provider) {
-        var _a = provider, provide = _a.provide, useClass = _a.useClass, useValue = _a.useValue, useFactory = _a.useFactory;
-        var record = this._recors.get(token) || {};
-        record.token = provide;
-        if (!isUndefined(useValue)) {
-            record.fn = resolveMulitProvider.call(this, provider, record);
+        var record = makeRecord(covertToFactory(token, provider));
+        if (provider.multi) {
+            var multiRecord_1 = this.records.get(token);
+            if (!multiRecord_1) {
+                multiRecord_1 = makeRecord(function () { return injectArgs(multiRecord_1.multi); }, NOT_YES, true);
+                this.records.set(token, multiRecord_1);
+            }
+            token = provider;
+            multiRecord_1.multi.push(provider);
         }
-        else if (useClass) {
-            var recordClass = this._recors.get(useClass) || { fn: resolveClassProvider.call(this, provider) };
-            record.fn = recordClass.fn;
-        }
-        else if (useFactory) {
-            record.fn = resolveFactoryProvider.call(this, provider);
-        }
-        this._recors.set(record.token, record);
+        this.records.set(token, record);
     };
-    StaticInjector.prototype.createClass = function (clazz) {
-        var _this = this;
-        var deps = reflect.getMetadata(designParamtypes, clazz) || [];
-        var injectTypes = clazz[__PROVIDE__INJECT__] || [];
-        var arvgs = deps.map(function (token) { return _this.get(token); });
-        injectTypes.forEach(function (_a) {
-            var token = _a.token, index = _a.index;
-            return arvgs[index] = _this.get(token);
-        });
-        return new (clazz.bind.apply(clazz, __spreadArray([void 0], arvgs, false)))();
+    StaticInjector.prototype.destory = function () {
+        this._destroyed = true;
+        this.parent = void (0);
+        !this._destroyed && this.onDestroy.forEach(function (service) { return service.destory(); });
+        this.records.clear();
     };
-    StaticInjector.prototype.clear = function () {
-        this._recors.clear();
-        this._instanceRecors.clear();
-        this.parentInjector = void (0);
+    StaticInjector.prototype.hydrate = function (token, record) {
+        if (record.value === NOT_YES) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            record.value = record.factory();
+        }
+        if (typeof record.value === 'object' &&
+            record.value.destory &&
+            !(record.value instanceof StaticInjector)) {
+            this.onDestroy.add(record.value);
+        }
+        return record.value;
     };
     return StaticInjector;
 }());
 export { StaticInjector };
-function resolveClassProvider(_a) {
-    var _b = _a.useNew, useNew = _b === void 0 ? false : _b, useClass = _a.useClass;
-    var instance;
-    return function () {
-        var isSelfContext = this.isSelfContext;
-        var newInstance = isSelfContext ? this._instanceRecors.get(useClass) : instance;
-        if (useNew || !newInstance) {
-            newInstance = this.createClass(useClass);
-            isSelfContext ? this._instanceRecors.set(useClass, newInstance) : instance = newInstance;
-        }
-        return newInstance;
-    };
-}
-function resolveMulitProvider(_a, _b) {
-    var useValue = _a.useValue, multi = _a.multi;
-    var _c = _b.fn, fn = _c === void 0 ? function () { return []; } : _c;
-    var preValue = fn.call(this);
-    return function () { return multi ? __spreadArray(__spreadArray([], preValue, true), [useValue], false) : useValue; };
-}
-function resolveFactoryProvider(_a) {
-    var useFactory = _a.useFactory, _b = _a.deps, deps = _b === void 0 ? [] : _b;
-    return function () {
-        var _this = this;
-        var params = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            params[_i] = arguments[_i];
-        }
-        return useFactory.apply(undefined, __spreadArray(__spreadArray([], deps.map(function (token) { return _this.get(token); }), true), params, true));
-    };
+export function createInjector(providers, parent) {
+    return new StaticInjector(providers, parent);
 }

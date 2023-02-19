@@ -1,24 +1,9 @@
-import { __rest } from "tslib";
-import { __PROVIDE__INJECT__, StaticInjector } from './injector';
-import { InjectorToken } from './injector-token';
-const injector = new StaticInjector();
-const toArray = (obj) => Array.isArray(obj) ? obj : [obj];
-const InjectableFactory = (defaultToken, defaultOptions) => (token, options) => (target) => {
-    if (!(token instanceof InjectorToken)) {
-        token = void (0);
-        options = token;
-    }
-    const _a = options || {}, { injector: _injector = injector } = _a, _options = __rest(_a, ["injector"]);
-    const providers = [token, defaultToken, target].filter((item) => !!item);
-    providers.forEach((provide) => _injector.set(provide, Object.assign(Object.assign(Object.assign({}, defaultOptions), _options), { provide, useClass: target })));
-    return target;
-};
-export const Inject = (token) => (target, name, index) => {
-    if (!target[__PROVIDE__INJECT__]) {
-        target[__PROVIDE__INJECT__] = [];
-    }
-    target[__PROVIDE__INJECT__].push({ token, index });
-};
-export const registryProvider = (provider) => toArray(provider).forEach((p) => injector.set(p.provide, p));
-export const Injectable = InjectableFactory(undefined, { useClass: true, useNew: false });
-export const getProvider = (target) => injector.get(target);
+import { makeDecorator, makeParamDecorator } from './decorators';
+import { setInjectableDef } from './def';
+import { attachInjectFlag } from './injector_compatibility';
+import { covertToFactory } from './util';
+export const Injectable = makeDecorator('Injectable', (ref) => ref, (injectableType, meta) => {
+    const provDef = { token: injectableType, providedIn: (meta === null || meta === void 0 ? void 0 : meta.providedIn) || 'root', factory: covertToFactory(injectableType, meta) };
+    setInjectableDef(injectableType, provDef);
+});
+export const Inject = attachInjectFlag(makeParamDecorator('Inject', (token) => ({ token })), -1 /* DecoratorFlags.Inject */);
