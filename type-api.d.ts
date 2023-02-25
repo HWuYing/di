@@ -3,6 +3,7 @@ declare interface TypeClass {
     [x: string]: any;
 }
 export declare interface Type<T = any> extends Function {
+    [x: string]: any;
     new (...args: any[]): T;
 }
 export declare type TokenKey = TypeClass | InjectorToken | Function;
