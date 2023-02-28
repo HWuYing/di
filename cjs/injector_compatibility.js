@@ -33,7 +33,7 @@ function injectArgs(types) {
             var flag = getInjectFlag(meta);
             if (typeof flag !== 'number')
                 return token = meta;
-            flag === -1 /* DecoratorFlags.Inject */ ? token = meta.token : flags = flags | flag;
+            flag === -1 /* Inject */ ? token = meta.token : flags = flags | flag;
         });
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         args.push(ɵɵinject(token, flags));

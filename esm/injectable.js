@@ -6,4 +6,4 @@ export const Injectable = makeDecorator('Injectable', (ref) => ref, (injectableT
     const provDef = { token: injectableType, providedIn: (meta === null || meta === void 0 ? void 0 : meta.providedIn) || 'root', factory: covertToFactory(injectableType, meta) };
     setInjectableDef(injectableType, provDef);
 });
-export const Inject = attachInjectFlag(makeParamDecorator('Inject', (token) => ({ token })), -1 /* DecoratorFlags.Inject */);
+export const Inject = attachInjectFlag(makeParamDecorator('Inject', (token) => ({ token })), -1 /* Inject */);
