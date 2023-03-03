@@ -63,6 +63,7 @@ export class StaticInjector {
         this._destroyed = true;
         this.parent = void (0);
         !this._destroyed && this.onDestroy.forEach((service) => service.destory());
+        this.onDestroy.clear();
         this.records.clear();
     }
     hydrate(token, record) {

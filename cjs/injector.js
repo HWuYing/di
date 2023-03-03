@@ -73,6 +73,7 @@ var StaticInjector = /** @class */ (function () {
         this._destroyed = true;
         this.parent = void (0);
         !this._destroyed && this.onDestroy.forEach(function (service) { return service.destory(); });
+        this.onDestroy.clear();
         this.records.clear();
     };
     StaticInjector.prototype.hydrate = function (token, record) {
