@@ -14,6 +14,9 @@ function deepForEach(input, fn) {
     input.forEach(value => Array.isArray(value) ? deepForEach(value, fn) : fn(value));
 }
 export class StaticInjector {
+    get destroyed() {
+        return this._destroyed;
+    }
     constructor(additionalProviders, parent) {
         this.parent = parent;
         this._destroyed = false;
@@ -23,9 +26,6 @@ export class StaticInjector {
         this.records.set(INJECTOR, makeRecord(() => this));
         const record = this.records.get(INJECTOR_SCOPE);
         this.scope = (record === null || record === void 0 ? void 0 : record.factory) ? record.factory() : null;
-    }
-    get destroyed() {
-        return this._destroyed;
     }
     get(token) {
         var _a;
