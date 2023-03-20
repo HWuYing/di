@@ -7,8 +7,8 @@ export declare interface Type<T = any> extends Function {
     new (...args: any[]): T;
 }
 export declare type TokenKey = TypeClass | InjectorToken | Function;
-export interface OnDestory {
-    destory(): void;
+export interface OnDestroy {
+    destroy(): void;
 }
 export interface AbstractProvider {
     provide: any;

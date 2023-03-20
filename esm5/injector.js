@@ -1,7 +1,7 @@
 import { getInjectableDef } from './def';
 import { injectArgs, saveCurrentInjector } from './injector_compatibility';
 import { INJECTOR, INJECTOR_SCOPE } from './injector-token';
-import { covertToFactory } from './util';
+import { convertToFactory } from './util';
 var NOT_YES = {};
 function makeRecord(factory, value, multi) {
     if (value === void 0) { value = NOT_YES; }
@@ -54,7 +54,7 @@ var StaticInjector = /** @class */ (function () {
         }
     };
     StaticInjector.prototype.set = function (token, provider) {
-        var record = makeRecord(covertToFactory(token, provider));
+        var record = makeRecord(convertToFactory(token, provider));
         if (provider.multi) {
             var multiRecord_1 = this.records.get(token);
             if (!multiRecord_1) {
@@ -66,10 +66,10 @@ var StaticInjector = /** @class */ (function () {
         }
         this.records.set(token, record);
     };
-    StaticInjector.prototype.destory = function () {
+    StaticInjector.prototype.destroy = function () {
         this._destroyed = true;
         this.parent = void (0);
-        !this._destroyed && this.onDestroy.forEach(function (service) { return service.destory(); });
+        !this._destroyed && this.onDestroy.forEach(function (service) { return service.destroy(); });
         this.onDestroy.clear();
         this.records.clear();
     };
@@ -79,7 +79,7 @@ var StaticInjector = /** @class */ (function () {
             record.value = record.factory();
         }
         if (typeof record.value === 'object' &&
-            record.value.destory &&
+            record.value.destroy &&
             !(record.value instanceof StaticInjector)) {
             this.onDestroy.add(record.value);
         }

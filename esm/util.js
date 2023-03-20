@@ -19,7 +19,7 @@ function hasDeps(value) {
 export function isClassProvider(value) {
     return !!(value && value.useClass);
 }
-export function covertToFactory(type, provider) {
+export function convertToFactory(type, provider) {
     if (!provider) {
         const deps = getDeps(type);
         return () => new type(...injectArgs(deps));

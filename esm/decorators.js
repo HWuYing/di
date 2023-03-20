@@ -61,11 +61,11 @@ export function makeMethodDecorator(name, props, typeFn) {
             return metaCtor.apply(this, args);
         }
         const annotationInstance = new MethodDecoratorFafctory(...args);
-        function MethodDecorator(prototype, method) {
-            typeFn && typeFn(prototype, method, ...args);
+        function MethodDecorator(prototype, method, descriptor) {
+            typeFn && typeFn(prototype, method, descriptor, ...args);
             // eslint-disable-next-line max-len
             const methods = hasOwnProperty(prototype, METHODS) ? prototype[METHODS] : Object.defineProperty(prototype, METHODS, { value: [] })[METHODS];
-            methods.push({ method, annotationInstance });
+            methods.push({ method, descriptor, annotationInstance });
             return prototype;
         }
         MethodDecorator.annotation = annotationInstance;

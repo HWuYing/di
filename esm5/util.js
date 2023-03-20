@@ -20,7 +20,7 @@ function hasDeps(value) {
 export function isClassProvider(value) {
     return !!(value && value.useClass);
 }
-export function covertToFactory(type, provider) {
+export function convertToFactory(type, provider) {
     if (!provider) {
         var deps_1 = getDeps(type);
         return function () { return new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps_1), false)))(); };

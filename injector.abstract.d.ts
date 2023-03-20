@@ -3,7 +3,7 @@ export declare abstract class Injector {
     readonly destroyed: boolean;
     abstract get<T = any>(token: Type<T> | TokenKey, ...params: any[]): T;
     abstract set(token: any, provider: Provider): void;
-    abstract destory(): void;
+    abstract destroy(): void;
     static __prov_def__: {
         token: typeof Injector;
         providedIn: string;

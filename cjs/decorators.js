@@ -86,11 +86,11 @@ function makeMethodDecorator(name, props, typeFn) {
             return metaCtor.apply(this, args);
         }
         var annotationInstance = new ((_a = MethodDecoratorFafctory).bind.apply(_a, tslib_1.__spreadArray([void 0], args, false)))();
-        function MethodDecorator(prototype, method) {
-            typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([prototype, method], args, false));
+        function MethodDecorator(prototype, method, descriptor) {
+            typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([prototype, method, descriptor], args, false));
             // eslint-disable-next-line max-len
             var methods = hasOwnProperty(prototype, exports.METHODS) ? prototype[exports.METHODS] : Object.defineProperty(prototype, exports.METHODS, { value: [] })[exports.METHODS];
-            methods.push({ method: method, annotationInstance: annotationInstance });
+            methods.push({ method: method, descriptor: descriptor, annotationInstance: annotationInstance });
             return prototype;
         }
         MethodDecorator.annotation = annotationInstance;

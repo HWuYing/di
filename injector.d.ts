@@ -10,7 +10,7 @@ export declare class StaticInjector {
     constructor(additionalProviders?: Provider[] | null, parent?: Injector);
     get<T>(token: Type<T> | TokenKey): T;
     set(token: any, provider: Provider): void;
-    destory(): void;
+    destroy(): void;
     private hydrate;
 }
 export declare function createInjector(providers?: Provider[] | null, parent?: Injector): StaticInjector;

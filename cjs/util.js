@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.covertToFactory = exports.isClassProvider = void 0;
+exports.convertToFactory = exports.isClassProvider = void 0;
 var tslib_1 = require("tslib");
 var injector_compatibility_1 = require("./injector_compatibility");
 var reflection_capabilities_1 = require("./reflection-capabilities");
@@ -24,7 +24,7 @@ function isClassProvider(value) {
     return !!(value && value.useClass);
 }
 exports.isClassProvider = isClassProvider;
-function covertToFactory(type, provider) {
+function convertToFactory(type, provider) {
     if (!provider) {
         var deps_1 = getDeps(type);
         return function () { return new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps_1), false)))(); };
@@ -48,4 +48,4 @@ function covertToFactory(type, provider) {
     var deps = hasDeps(provider) ? provider.deps : getDeps(_type);
     return function () { return new (_type.bind.apply(_type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps || []), false)))(); };
 }
-exports.covertToFactory = covertToFactory;
+exports.convertToFactory = convertToFactory;
