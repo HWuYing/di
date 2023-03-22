@@ -1,4 +1,4 @@
-import { makeDecorator, makeParamDecorator } from './decorators';
+import { makeDecorator, makeParamDecorator, makePropDecorator } from './decorators';
 import { setInjectableDef } from './def';
 import { attachInjectFlag } from './injector_compatibility';
 import { convertToFactory } from './util';
@@ -7,3 +7,4 @@ export const Injectable = makeDecorator('Injectable', (ref) => ref, (injectableT
     setInjectableDef(injectableType, provDef);
 });
 export const Inject = attachInjectFlag(makeParamDecorator('Inject', (token) => ({ token })), -1 /* DecoratorFlags.Inject */);
+export const Prop = attachInjectFlag(makePropDecorator('Prop', (token) => ({ token })), -1 /* DecoratorPropFlags.Prop */);

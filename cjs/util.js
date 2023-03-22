@@ -4,9 +4,15 @@ exports.convertToFactory = exports.isClassProvider = void 0;
 var tslib_1 = require("tslib");
 var injector_compatibility_1 = require("./injector_compatibility");
 var reflection_capabilities_1 = require("./reflection-capabilities");
+var _reflect = null;
+function getReflect() {
+    return (_reflect = _reflect || new reflection_capabilities_1.ReflectionCapabilities());
+}
 function getDeps(type) {
-    var reflectionCapabilities = new reflection_capabilities_1.ReflectionCapabilities();
-    return reflectionCapabilities.parameters(type);
+    return getReflect().parameters(type);
+}
+function getPropMetadata(type) {
+    return getReflect().propMetadata(type);
 }
 function isValueProvider(value) {
     return !!(value && typeof value === 'object' && value.useValue);
@@ -27,7 +33,7 @@ exports.isClassProvider = isClassProvider;
 function convertToFactory(type, provider) {
     if (!provider) {
         var deps_1 = getDeps(type);
-        return function () { return new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps_1), false)))(); };
+        return function () { return (0, injector_compatibility_1.propArgs)(new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps_1), false)))(), getPropMetadata(type)); };
     }
     if (isValueProvider(provider)) {
         return function () { return provider.useValue; };
@@ -46,6 +52,6 @@ function convertToFactory(type, provider) {
     }
     var _type = isClassProvider(provider) ? provider.useClass : type;
     var deps = hasDeps(provider) ? provider.deps : getDeps(_type);
-    return function () { return new (_type.bind.apply(_type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps || []), false)))(); };
+    return function () { return (0, injector_compatibility_1.propArgs)(new (_type.bind.apply(_type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps || []), false)))(), getPropMetadata(_type)); };
 }
 exports.convertToFactory = convertToFactory;

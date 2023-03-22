@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Inject = exports.Injectable = void 0;
+exports.Prop = exports.Inject = exports.Injectable = void 0;
 var decorators_1 = require("./decorators");
 var def_1 = require("./def");
 var injector_compatibility_1 = require("./injector_compatibility");
@@ -10,3 +10,4 @@ exports.Injectable = (0, decorators_1.makeDecorator)('Injectable', function (ref
     (0, def_1.setInjectableDef)(injectableType, provDef);
 });
 exports.Inject = (0, injector_compatibility_1.attachInjectFlag)((0, decorators_1.makeParamDecorator)('Inject', function (token) { return ({ token: token }); }), -1 /* DecoratorFlags.Inject */);
+exports.Prop = (0, injector_compatibility_1.attachInjectFlag)((0, decorators_1.makePropDecorator)('Prop', function (token) { return ({ token: token }); }), -1 /* DecoratorPropFlags.Prop */);

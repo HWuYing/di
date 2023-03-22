@@ -1,9 +1,15 @@
 import { __spreadArray } from "tslib";
-import { injectArgs, ɵɵinject } from './injector_compatibility';
+import { injectArgs, ɵɵinject, propArgs } from './injector_compatibility';
 import { ReflectionCapabilities } from './reflection-capabilities';
+var _reflect = null;
+function getReflect() {
+    return (_reflect = _reflect || new ReflectionCapabilities());
+}
 function getDeps(type) {
-    var reflectionCapabilities = new ReflectionCapabilities();
-    return reflectionCapabilities.parameters(type);
+    return getReflect().parameters(type);
+}
+function getPropMetadata(type) {
+    return getReflect().propMetadata(type);
 }
 function isValueProvider(value) {
     return !!(value && typeof value === 'object' && value.useValue);
@@ -23,7 +29,7 @@ export function isClassProvider(value) {
 export function convertToFactory(type, provider) {
     if (!provider) {
         var deps_1 = getDeps(type);
-        return function () { return new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps_1), false)))(); };
+        return function () { return propArgs(new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps_1), false)))(), getPropMetadata(type)); };
     }
     if (isValueProvider(provider)) {
         return function () { return provider.useValue; };
@@ -42,5 +48,5 @@ export function convertToFactory(type, provider) {
     }
     var _type = isClassProvider(provider) ? provider.useClass : type;
     var deps = hasDeps(provider) ? provider.deps : getDeps(_type);
-    return function () { return new (_type.bind.apply(_type, __spreadArray([void 0], injectArgs(deps || []), false)))(); };
+    return function () { return propArgs(new (_type.bind.apply(_type, __spreadArray([void 0], injectArgs(deps || []), false)))(), getPropMetadata(_type)); };
 }

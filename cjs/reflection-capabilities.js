@@ -4,6 +4,12 @@ exports.ReflectionCapabilities = void 0;
 require("reflect-metadata");
 var decorators_1 = require("./decorators");
 var designParamtypes = "design:paramtypes";
+// eslint-disable-next-line @typescript-eslint/ban-types
+function getParentCtor(ctor) {
+    var parentProto = ctor.prototype ? Object.getPrototypeOf(ctor.prototype) : null;
+    var parentCtor = parentProto ? parentProto.constructor : null;
+    return parentCtor || Object;
+}
 var ReflectionCapabilities = /** @class */ (function () {
     function ReflectionCapabilities() {
         this._reflect = typeof global === 'object' ? global.Reflect : typeof self === 'object' ? self.Reflect : Reflect;
@@ -23,6 +29,23 @@ var ReflectionCapabilities = /** @class */ (function () {
             }
         }
         return result;
+    };
+    ReflectionCapabilities.prototype.propMetadata = function (type) {
+        var stack = [{ typeFunc: type }];
+        var propMetadata = {};
+        var _loop_1 = function () {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            var typeFunc = stack.shift().typeFunc;
+            // eslint-disable-next-line no-prototype-builtins
+            var metadata = typeFunc.hasOwnProperty(decorators_1.PROP_METADATA) && typeFunc[decorators_1.PROP_METADATA];
+            Object.keys(metadata).forEach(function (key) { return propMetadata[key] ? undefined : propMetadata[key] = metadata[key]; });
+            if (getParentCtor(typeFunc) !== Object)
+                stack.push({ typeFunc: getParentCtor(typeFunc) });
+        };
+        while (stack.length) {
+            _loop_1();
+        }
+        return propMetadata;
     };
     return ReflectionCapabilities;
 }());

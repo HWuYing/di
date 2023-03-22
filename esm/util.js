@@ -1,8 +1,14 @@
-import { injectArgs, ɵɵinject } from './injector_compatibility';
+import { injectArgs, ɵɵinject, propArgs } from './injector_compatibility';
 import { ReflectionCapabilities } from './reflection-capabilities';
+let _reflect = null;
+function getReflect() {
+    return (_reflect = _reflect || new ReflectionCapabilities());
+}
 function getDeps(type) {
-    const reflectionCapabilities = new ReflectionCapabilities();
-    return reflectionCapabilities.parameters(type);
+    return getReflect().parameters(type);
+}
+function getPropMetadata(type) {
+    return getReflect().propMetadata(type);
 }
 function isValueProvider(value) {
     return !!(value && typeof value === 'object' && value.useValue);
@@ -22,7 +28,7 @@ export function isClassProvider(value) {
 export function convertToFactory(type, provider) {
     if (!provider) {
         const deps = getDeps(type);
-        return () => new type(...injectArgs(deps));
+        return () => propArgs(new type(...injectArgs(deps)), getPropMetadata(type));
     }
     if (isValueProvider(provider)) {
         return () => provider.useValue;
@@ -35,5 +41,5 @@ export function convertToFactory(type, provider) {
     }
     const _type = isClassProvider(provider) ? provider.useClass : type;
     const deps = hasDeps(provider) ? provider.deps : getDeps(_type);
-    return () => new _type(...injectArgs(deps || []));
+    return () => propArgs(new _type(...injectArgs(deps || [])), getPropMetadata(_type));
 }

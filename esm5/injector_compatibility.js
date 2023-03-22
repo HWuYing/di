@@ -33,3 +33,20 @@ export function injectArgs(types) {
     });
     return args;
 }
+export function propArgs(type, propMetadata) {
+    var props = {};
+    Object.keys(propMetadata).forEach(function (prop) {
+        var arrMetadata = propMetadata[prop];
+        var flags = 0;
+        var token = undefined;
+        arrMetadata.forEach(function (meta) {
+            var flag = getInjectFlag(meta);
+            if (typeof flag !== 'number')
+                return token = meta;
+            flag === -1 /* DecoratorPropFlags.Prop */ ? token = meta.token : flags = flags | flag;
+        });
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        props[prop] = ɵɵinject(token, flags);
+    });
+    return Object.assign(type, props);
+}

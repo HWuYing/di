@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.injectArgs = exports.getInjectFlag = exports.attachInjectFlag = exports.saveCurrentInjector = exports.ɵɵinject = void 0;
+exports.propArgs = exports.injectArgs = exports.getInjectFlag = exports.attachInjectFlag = exports.saveCurrentInjector = exports.ɵɵinject = void 0;
 var DI_DECORATOR_FLAG = '__DI_FLAG__';
 var injector = null;
 function ɵɵinject(token, flags) {
@@ -41,3 +41,21 @@ function injectArgs(types) {
     return args;
 }
 exports.injectArgs = injectArgs;
+function propArgs(type, propMetadata) {
+    var props = {};
+    Object.keys(propMetadata).forEach(function (prop) {
+        var arrMetadata = propMetadata[prop];
+        var flags = 0;
+        var token = undefined;
+        arrMetadata.forEach(function (meta) {
+            var flag = getInjectFlag(meta);
+            if (typeof flag !== 'number')
+                return token = meta;
+            flag === -1 /* DecoratorPropFlags.Prop */ ? token = meta.token : flags = flags | flag;
+        });
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        props[prop] = ɵɵinject(token, flags);
+    });
+    return Object.assign(type, props);
+}
+exports.propArgs = propArgs;

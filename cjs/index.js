@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertToFactory = exports.InjectorToken = exports.INJECTOR_SCOPE = exports.Injector = exports.Injectable = exports.Inject = exports.setInjectableDef = exports.INJECTOR_PROV_DEF = exports.makeParamDecorator = exports.makeMethodDecorator = exports.makeDecorator = void 0;
+exports.convertToFactory = exports.InjectorToken = exports.INJECTOR_SCOPE = exports.Injector = exports.Prop = exports.Injectable = exports.Inject = exports.setInjectableDef = exports.INJECTOR_PROV_DEF = exports.makeParamDecorator = exports.makeMethodDecorator = exports.makeDecorator = void 0;
 var decorators_1 = require("./decorators");
 Object.defineProperty(exports, "makeDecorator", { enumerable: true, get: function () { return decorators_1.makeDecorator; } });
 Object.defineProperty(exports, "makeMethodDecorator", { enumerable: true, get: function () { return decorators_1.makeMethodDecorator; } });
@@ -11,6 +11,7 @@ Object.defineProperty(exports, "setInjectableDef", { enumerable: true, get: func
 var injectable_1 = require("./injectable");
 Object.defineProperty(exports, "Inject", { enumerable: true, get: function () { return injectable_1.Inject; } });
 Object.defineProperty(exports, "Injectable", { enumerable: true, get: function () { return injectable_1.Injectable; } });
+Object.defineProperty(exports, "Prop", { enumerable: true, get: function () { return injectable_1.Prop; } });
 var injector_abstract_1 = require("./injector.abstract");
 Object.defineProperty(exports, "Injector", { enumerable: true, get: function () { return injector_abstract_1.Injector; } });
 var injector_token_1 = require("./injector-token");

@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeMethodDecorator = exports.makeParamDecorator = exports.makeDecorator = exports.METHODS = exports.PARAMETERS = exports.ANNOTATIONS = void 0;
+exports.makePropDecorator = exports.makeMethodDecorator = exports.makeParamDecorator = exports.makeDecorator = exports.PROP_METADATA = exports.METHODS = exports.PARAMETERS = exports.ANNOTATIONS = void 0;
 var tslib_1 = require("tslib");
 exports.ANNOTATIONS = '__annotations__';
 exports.PARAMETERS = '__parameters__';
 exports.METHODS = '__methods__';
+exports.PROP_METADATA = '__prop__metadata__';
 function hasOwnProperty(object, v) {
     return Object.prototype.hasOwnProperty.call(object, v);
 }
@@ -86,12 +87,12 @@ function makeMethodDecorator(name, props, typeFn) {
             return metaCtor.apply(this, args);
         }
         var annotationInstance = new ((_a = MethodDecoratorFafctory).bind.apply(_a, tslib_1.__spreadArray([void 0], args, false)))();
-        function MethodDecorator(prototype, method, descriptor) {
-            typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([prototype, method, descriptor], args, false));
+        function MethodDecorator(_a, method, descriptor) {
+            var constructor = _a.constructor;
+            typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([constructor, method, descriptor], args, false));
             // eslint-disable-next-line max-len
-            var methods = hasOwnProperty(prototype, exports.METHODS) ? prototype[exports.METHODS] : Object.defineProperty(prototype, exports.METHODS, { value: [] })[exports.METHODS];
+            var methods = hasOwnProperty(constructor, exports.METHODS) ? constructor[exports.METHODS] : Object.defineProperty(constructor, exports.METHODS, { value: [] })[exports.METHODS];
             methods.push({ method: method, descriptor: descriptor, annotationInstance: annotationInstance });
-            return prototype;
         }
         MethodDecorator.annotation = annotationInstance;
         return MethodDecorator;
@@ -100,3 +101,30 @@ function makeMethodDecorator(name, props, typeFn) {
     return MethodDecoratorFafctory;
 }
 exports.makeMethodDecorator = makeMethodDecorator;
+function makePropDecorator(name, props, typeFn) {
+    var metaCtor = makeMetadataCtor(props);
+    function PropDecoratorFactory() {
+        var _a;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        if (this instanceof PropDecoratorFactory) {
+            return metaCtor.apply(this, args);
+        }
+        var annotationInstance = new ((_a = PropDecoratorFactory).bind.apply(_a, tslib_1.__spreadArray([void 0], args, false)))();
+        function PropDecorator(_a, prop) {
+            var constructor = _a.constructor;
+            typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([constructor, prop], args, false));
+            // eslint-disable-next-line max-len
+            var meta = hasOwnProperty(constructor, exports.PROP_METADATA) ? constructor[exports.PROP_METADATA] : Object.defineProperty(constructor, exports.PROP_METADATA, { value: {} })[exports.PROP_METADATA];
+            // eslint-disable-next-line no-prototype-builtins
+            meta[prop] = meta.hasOwnProperty(prop) && meta[prop] || [];
+            meta[prop].unshift(annotationInstance);
+        }
+        return PropDecorator;
+    }
+    PropDecoratorFactory.prototype.metadataName = name;
+    return PropDecoratorFactory;
+}
+exports.makePropDecorator = makePropDecorator;

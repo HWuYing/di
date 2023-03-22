@@ -2,6 +2,7 @@ import { __spreadArray } from "tslib";
 export var ANNOTATIONS = '__annotations__';
 export var PARAMETERS = '__parameters__';
 export var METHODS = '__methods__';
+export var PROP_METADATA = '__prop__metadata__';
 function hasOwnProperty(object, v) {
     return Object.prototype.hasOwnProperty.call(object, v);
 }
@@ -81,16 +82,42 @@ export function makeMethodDecorator(name, props, typeFn) {
             return metaCtor.apply(this, args);
         }
         var annotationInstance = new ((_a = MethodDecoratorFafctory).bind.apply(_a, __spreadArray([void 0], args, false)))();
-        function MethodDecorator(prototype, method, descriptor) {
-            typeFn && typeFn.apply(void 0, __spreadArray([prototype, method, descriptor], args, false));
+        function MethodDecorator(_a, method, descriptor) {
+            var constructor = _a.constructor;
+            typeFn && typeFn.apply(void 0, __spreadArray([constructor, method, descriptor], args, false));
             // eslint-disable-next-line max-len
-            var methods = hasOwnProperty(prototype, METHODS) ? prototype[METHODS] : Object.defineProperty(prototype, METHODS, { value: [] })[METHODS];
+            var methods = hasOwnProperty(constructor, METHODS) ? constructor[METHODS] : Object.defineProperty(constructor, METHODS, { value: [] })[METHODS];
             methods.push({ method: method, descriptor: descriptor, annotationInstance: annotationInstance });
-            return prototype;
         }
         MethodDecorator.annotation = annotationInstance;
         return MethodDecorator;
     }
     MethodDecoratorFafctory.prototype.metadataName = name;
     return MethodDecoratorFafctory;
+}
+export function makePropDecorator(name, props, typeFn) {
+    var metaCtor = makeMetadataCtor(props);
+    function PropDecoratorFactory() {
+        var _a;
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        if (this instanceof PropDecoratorFactory) {
+            return metaCtor.apply(this, args);
+        }
+        var annotationInstance = new ((_a = PropDecoratorFactory).bind.apply(_a, __spreadArray([void 0], args, false)))();
+        function PropDecorator(_a, prop) {
+            var constructor = _a.constructor;
+            typeFn && typeFn.apply(void 0, __spreadArray([constructor, prop], args, false));
+            // eslint-disable-next-line max-len
+            var meta = hasOwnProperty(constructor, PROP_METADATA) ? constructor[PROP_METADATA] : Object.defineProperty(constructor, PROP_METADATA, { value: {} })[PROP_METADATA];
+            // eslint-disable-next-line no-prototype-builtins
+            meta[prop] = meta.hasOwnProperty(prop) && meta[prop] || [];
+            meta[prop].unshift(annotationInstance);
+        }
+        return PropDecorator;
+    }
+    PropDecoratorFactory.prototype.metadataName = name;
+    return PropDecoratorFactory;
 }
