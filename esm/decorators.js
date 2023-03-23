@@ -24,11 +24,9 @@ export function makeDecorator(name, props, typeFn) {
         }
         const annotationInstance = new DecoratorFactory(...args);
         return function TypeDecorator(cls) {
-            const _type = typeFn && typeFn(cls, ...args) || cls;
-            // eslint-disable-next-line max-len
             const annotations = hasOwnProperty(cls, ANNOTATIONS) ? cls[ANNOTATIONS] : Object.defineProperty(cls, ANNOTATIONS, { value: [] })[ANNOTATIONS];
             annotations.push(annotationInstance);
-            return _type;
+            return typeFn && typeFn(cls, ...args) || cls;
         };
     }
     DecoratorFactory.prototype.metadataName = name;
@@ -42,7 +40,6 @@ export function makeParamDecorator(name, props) {
         }
         const annotationInstance = new ParamDecoratorFactory(...args);
         function ParamDecorator(cls, name, index) {
-            // eslint-disable-next-line max-len
             const parameters = hasOwnProperty(cls, PARAMETERS) ? cls[PARAMETERS] : Object.defineProperty(cls, PARAMETERS, { value: [] })[PARAMETERS];
             while (parameters.length <= index)
                 parameters.push(null);
@@ -63,10 +60,9 @@ export function makeMethodDecorator(name, props, typeFn) {
         }
         const annotationInstance = new MethodDecoratorFafctory(...args);
         function MethodDecorator({ constructor }, method, descriptor) {
-            typeFn && typeFn(constructor, method, descriptor, ...args);
-            // eslint-disable-next-line max-len
             const methods = hasOwnProperty(constructor, METHODS) ? constructor[METHODS] : Object.defineProperty(constructor, METHODS, { value: [] })[METHODS];
             methods.push({ method, descriptor, annotationInstance });
+            typeFn && typeFn(constructor, method, descriptor, ...args);
         }
         MethodDecorator.annotation = annotationInstance;
         return MethodDecorator;
@@ -82,12 +78,10 @@ export function makePropDecorator(name, props, typeFn) {
         }
         const annotationInstance = new PropDecoratorFactory(...args);
         function PropDecorator({ constructor }, prop) {
-            typeFn && typeFn(constructor, prop, ...args);
-            // eslint-disable-next-line max-len
             const meta = hasOwnProperty(constructor, PROP_METADATA) ? constructor[PROP_METADATA] : Object.defineProperty(constructor, PROP_METADATA, { value: {} })[PROP_METADATA];
-            // eslint-disable-next-line no-prototype-builtins
-            meta[prop] = meta.hasOwnProperty(prop) && meta[prop] || [];
+            meta[prop] = hasOwnProperty(meta, prop) && meta[prop] || [];
             meta[prop].unshift(annotationInstance);
+            typeFn && typeFn(constructor, prop, ...args);
         }
         return PropDecorator;
     }

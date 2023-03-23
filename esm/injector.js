@@ -2,6 +2,11 @@ import { getInjectableDef } from './def';
 import { injectArgs, saveCurrentInjector } from './injector_compatibility';
 import { INJECTOR, INJECTOR_SCOPE } from './injector-token';
 import { convertToFactory } from './util';
+export var InjectFlags;
+(function (InjectFlags) {
+    InjectFlags[InjectFlags["Default"] = 0] = "Default";
+    InjectFlags[InjectFlags["Self"] = 2] = "Self";
+})(InjectFlags || (InjectFlags = {}));
 const NOT_YES = {};
 function makeRecord(factory, value = NOT_YES, multi = false) {
     return { factory, value, multi: multi ? [] : undefined };
@@ -24,10 +29,9 @@ export class StaticInjector {
         this.records = new Map();
         deepForEach(additionalProviders || [], (provider) => this.set(typeof provider === 'function' ? provider : provider.provide, provider));
         this.records.set(INJECTOR, makeRecord(() => this));
-        const record = this.records.get(INJECTOR_SCOPE);
-        this.scope = (record === null || record === void 0 ? void 0 : record.factory) ? record.factory() : null;
+        this.scope = this.get(INJECTOR_SCOPE, InjectFlags.Self);
     }
-    get(token) {
+    get(token, flags = InjectFlags.Default) {
         var _a;
         const reInjector = saveCurrentInjector(this);
         try {
@@ -40,7 +44,7 @@ export class StaticInjector {
                 record = def && checkInjectableScope(this.scope, def) ? makeRecord(def.factory) : null;
                 this.records.set(token, record || null);
             }
-            return record !== null ? this.hydrate(token, record) : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token);
+            return record !== null ? this.hydrate(token, record) : flags & InjectFlags.Self ? null : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token);
         }
         finally {
             saveCurrentInjector(reInjector);
@@ -60,10 +64,11 @@ export class StaticInjector {
         this.records.set(token, record);
     }
     destroy() {
-        this._destroyed = true;
-        this.parent = void (0);
-        !this._destroyed && this.onDestroy.forEach((service) => service.destroy());
+        const onDestroy = Array.from(this.onDestroy);
         this.onDestroy.clear();
+        this.parent = void (0);
+        onDestroy.forEach((service) => service.destroy());
+        this._destroyed = true;
         this.records.clear();
     }
     hydrate(token, record) {

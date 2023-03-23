@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createInjector = exports.StaticInjector = void 0;
+exports.createInjector = exports.StaticInjector = exports.InjectFlags = void 0;
 var def_1 = require("./def");
 var injector_compatibility_1 = require("./injector_compatibility");
 var injector_token_1 = require("./injector-token");
 var util_1 = require("./util");
+var InjectFlags;
+(function (InjectFlags) {
+    InjectFlags[InjectFlags["Default"] = 0] = "Default";
+    InjectFlags[InjectFlags["Self"] = 2] = "Self";
+})(InjectFlags = exports.InjectFlags || (exports.InjectFlags = {}));
 var NOT_YES = {};
 function makeRecord(factory, value, multi) {
     if (value === void 0) { value = NOT_YES; }
@@ -27,8 +32,7 @@ var StaticInjector = /** @class */ (function () {
         this.records = new Map();
         deepForEach(additionalProviders || [], function (provider) { return _this.set(typeof provider === 'function' ? provider : provider.provide, provider); });
         this.records.set(injector_token_1.INJECTOR, makeRecord(function () { return _this; }));
-        var record = this.records.get(injector_token_1.INJECTOR_SCOPE);
-        this.scope = (record === null || record === void 0 ? void 0 : record.factory) ? record.factory() : null;
+        this.scope = this.get(injector_token_1.INJECTOR_SCOPE, InjectFlags.Self);
     }
     Object.defineProperty(StaticInjector.prototype, "destroyed", {
         get: function () {
@@ -37,8 +41,9 @@ var StaticInjector = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    StaticInjector.prototype.get = function (token) {
+    StaticInjector.prototype.get = function (token, flags) {
         var _a;
+        if (flags === void 0) { flags = InjectFlags.Default; }
         var reInjector = (0, injector_compatibility_1.saveCurrentInjector)(this);
         try {
             if (this.destroyed) {
@@ -50,7 +55,7 @@ var StaticInjector = /** @class */ (function () {
                 record = def && checkInjectableScope(this.scope, def) ? makeRecord(def.factory) : null;
                 this.records.set(token, record || null);
             }
-            return record !== null ? this.hydrate(token, record) : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token);
+            return record !== null ? this.hydrate(token, record) : flags & InjectFlags.Self ? null : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token);
         }
         finally {
             (0, injector_compatibility_1.saveCurrentInjector)(reInjector);
@@ -70,10 +75,11 @@ var StaticInjector = /** @class */ (function () {
         this.records.set(token, record);
     };
     StaticInjector.prototype.destroy = function () {
-        this._destroyed = true;
-        this.parent = void (0);
-        !this._destroyed && this.onDestroy.forEach(function (service) { return service.destroy(); });
+        var onDestroy = Array.from(this.onDestroy);
         this.onDestroy.clear();
+        this.parent = void (0);
+        onDestroy.forEach(function (service) { return service.destroy(); });
+        this._destroyed = true;
         this.records.clear();
     };
     StaticInjector.prototype.hydrate = function (token, record) {

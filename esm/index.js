@@ -1,6 +1,6 @@
-export { makeDecorator, makeMethodDecorator, makeParamDecorator } from './decorators';
+export { makeDecorator, makeMethodDecorator, makeParamDecorator, makePropDecorator } from './decorators';
 export { INJECTOR_PROV_DEF, setInjectableDef } from './def';
-export { Inject, Injectable, Prop } from './injectable';
+export { Inject, Injectable, Prop, ROOT_SCOPE } from './injectable';
 export { Injector } from './injector.abstract';
 export { INJECTOR_SCOPE, InjectorToken } from './injector-token';
 export { convertToFactory } from './util';

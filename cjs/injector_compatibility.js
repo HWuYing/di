@@ -35,7 +35,6 @@ function injectArgs(types) {
                 return token = meta;
             flag === -1 /* DecoratorFlags.Inject */ ? token = meta.token : flags = flags | flag;
         });
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         args.push(ɵɵinject(token, flags));
     });
     return args;
@@ -53,8 +52,8 @@ function propArgs(type, propMetadata) {
                 return token = meta;
             flag === -1 /* DecoratorPropFlags.Prop */ ? token = meta.token : flags = flags | flag;
         });
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        props[prop] = ɵɵinject(token, flags);
+        var value = ɵɵinject(token, flags);
+        typeof value !== 'undefined' && (props[prop] = value);
     });
     return Object.assign(type, props);
 }

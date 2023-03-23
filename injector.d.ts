@@ -1,5 +1,9 @@
 import { Injector } from './injector.abstract';
 import { Provider, TokenKey, Type } from './type-api';
+export declare enum InjectFlags {
+    Default = 0,
+    Self = 2
+}
 export declare class StaticInjector {
     protected parent?: Injector;
     private scope;
@@ -8,7 +12,7 @@ export declare class StaticInjector {
     private onDestroy;
     private records;
     constructor(additionalProviders?: Provider[] | null, parent?: Injector);
-    get<T>(token: Type<T> | TokenKey): T;
+    get<T>(token: Type<T> | TokenKey, flags?: InjectFlags): T;
     set(token: any, provider: Provider): void;
     destroy(): void;
     private hydrate;

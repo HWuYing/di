@@ -34,11 +34,9 @@ export function makeDecorator(name, props, typeFn) {
         }
         var annotationInstance = new ((_a = DecoratorFactory).bind.apply(_a, __spreadArray([void 0], args, false)))();
         return function TypeDecorator(cls) {
-            var _type = typeFn && typeFn.apply(void 0, __spreadArray([cls], args, false)) || cls;
-            // eslint-disable-next-line max-len
             var annotations = hasOwnProperty(cls, ANNOTATIONS) ? cls[ANNOTATIONS] : Object.defineProperty(cls, ANNOTATIONS, { value: [] })[ANNOTATIONS];
             annotations.push(annotationInstance);
-            return _type;
+            return typeFn && typeFn.apply(void 0, __spreadArray([cls], args, false)) || cls;
         };
     }
     DecoratorFactory.prototype.metadataName = name;
@@ -57,7 +55,6 @@ export function makeParamDecorator(name, props) {
         }
         var annotationInstance = new ((_a = ParamDecoratorFactory).bind.apply(_a, __spreadArray([void 0], args, false)))();
         function ParamDecorator(cls, name, index) {
-            // eslint-disable-next-line max-len
             var parameters = hasOwnProperty(cls, PARAMETERS) ? cls[PARAMETERS] : Object.defineProperty(cls, PARAMETERS, { value: [] })[PARAMETERS];
             while (parameters.length <= index)
                 parameters.push(null);
@@ -84,10 +81,9 @@ export function makeMethodDecorator(name, props, typeFn) {
         var annotationInstance = new ((_a = MethodDecoratorFafctory).bind.apply(_a, __spreadArray([void 0], args, false)))();
         function MethodDecorator(_a, method, descriptor) {
             var constructor = _a.constructor;
-            typeFn && typeFn.apply(void 0, __spreadArray([constructor, method, descriptor], args, false));
-            // eslint-disable-next-line max-len
             var methods = hasOwnProperty(constructor, METHODS) ? constructor[METHODS] : Object.defineProperty(constructor, METHODS, { value: [] })[METHODS];
             methods.push({ method: method, descriptor: descriptor, annotationInstance: annotationInstance });
+            typeFn && typeFn.apply(void 0, __spreadArray([constructor, method, descriptor], args, false));
         }
         MethodDecorator.annotation = annotationInstance;
         return MethodDecorator;
@@ -109,12 +105,10 @@ export function makePropDecorator(name, props, typeFn) {
         var annotationInstance = new ((_a = PropDecoratorFactory).bind.apply(_a, __spreadArray([void 0], args, false)))();
         function PropDecorator(_a, prop) {
             var constructor = _a.constructor;
-            typeFn && typeFn.apply(void 0, __spreadArray([constructor, prop], args, false));
-            // eslint-disable-next-line max-len
             var meta = hasOwnProperty(constructor, PROP_METADATA) ? constructor[PROP_METADATA] : Object.defineProperty(constructor, PROP_METADATA, { value: {} })[PROP_METADATA];
-            // eslint-disable-next-line no-prototype-builtins
-            meta[prop] = meta.hasOwnProperty(prop) && meta[prop] || [];
+            meta[prop] = hasOwnProperty(meta, prop) && meta[prop] || [];
             meta[prop].unshift(annotationInstance);
+            typeFn && typeFn.apply(void 0, __spreadArray([constructor, prop], args, false));
         }
         return PropDecorator;
     }
