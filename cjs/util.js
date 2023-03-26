@@ -30,10 +30,22 @@ function isClassProvider(value) {
     return !!(value && value.useClass);
 }
 exports.isClassProvider = isClassProvider;
+var empty = {};
+function factory(deps, type) {
+    var _m = empty;
+    return function () {
+        if (_m !== empty)
+            return _m;
+        var m = new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps), false)))();
+        (0, injector_compatibility_1.propArgs)(_m = m, getPropMetadata(type));
+        _m = empty;
+        return m;
+    };
+}
 function convertToFactory(type, provider) {
     if (!provider) {
         var deps_1 = getDeps(type);
-        return function () { return (0, injector_compatibility_1.propArgs)(new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps_1), false)))(), getPropMetadata(type)); };
+        return factory(deps_1, type);
     }
     if (isValueProvider(provider)) {
         return function () { return provider.useValue; };
@@ -52,6 +64,6 @@ function convertToFactory(type, provider) {
     }
     var _type = isClassProvider(provider) ? provider.useClass : type;
     var deps = hasDeps(provider) ? provider.deps : getDeps(_type);
-    return function () { return (0, injector_compatibility_1.propArgs)(new (_type.bind.apply(_type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps || []), false)))(), getPropMetadata(_type)); };
+    return factory(deps, _type);
 }
 exports.convertToFactory = convertToFactory;

@@ -32,20 +32,20 @@ export function injectArgs(types) {
     });
     return args;
 }
+var defaultTransform = function (type, name, value) { return value !== undefined && (type[name] = value); };
 export function propArgs(type, propMetadata) {
-    var props = {};
     Object.keys(propMetadata).forEach(function (prop) {
-        var arrMetadata = propMetadata[prop];
         var flags = 0;
+        var transform;
         var token = undefined;
-        arrMetadata.forEach(function (meta) {
+        propMetadata[prop].forEach(function (meta) {
             var flag = getInjectFlag(meta);
+            transform = meta.transform || defaultTransform;
             if (typeof flag !== 'number')
                 return token = meta;
             flag === -1 /* DecoratorPropFlags.Prop */ ? token = meta.token : flags = flags | flag;
         });
-        var value = ɵɵinject(token, flags);
-        typeof value !== 'undefined' && (props[prop] = value);
+        transform(type, prop, ɵɵinject(token, flags));
     });
-    return Object.assign(type, props);
+    return type;
 }

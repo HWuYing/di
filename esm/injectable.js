@@ -7,5 +7,6 @@ export const Injectable = makeDecorator('Injectable', (ref) => ref, (injectableT
     const provDef = { token: injectableType, providedIn: (meta === null || meta === void 0 ? void 0 : meta.providedIn) || ROOT_SCOPE, factory: convertToFactory(injectableType, meta) };
     setInjectableDef(injectableType, provDef);
 });
-export const Inject = attachInjectFlag(makeParamDecorator('Inject', (token) => ({ token })), -1 /* DecoratorFlags.Inject */);
-export const Prop = attachInjectFlag(makePropDecorator('Prop', (token) => ({ token })), -1 /* DecoratorPropFlags.Prop */);
+const mergeInfo = (token, options = {}) => (Object.assign(Object.assign({}, options), { token }));
+export const Inject = attachInjectFlag(makeParamDecorator('Inject', mergeInfo), -1 /* DecoratorFlags.Inject */);
+export const Prop = attachInjectFlag(makePropDecorator('Prop', mergeInfo), -1 /* DecoratorPropFlags.Prop */);

@@ -26,10 +26,22 @@ function hasDeps(value) {
 export function isClassProvider(value) {
     return !!(value && value.useClass);
 }
+var empty = {};
+function factory(deps, type) {
+    var _m = empty;
+    return function () {
+        if (_m !== empty)
+            return _m;
+        var m = new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps), false)))();
+        propArgs(_m = m, getPropMetadata(type));
+        _m = empty;
+        return m;
+    };
+}
 export function convertToFactory(type, provider) {
     if (!provider) {
         var deps_1 = getDeps(type);
-        return function () { return propArgs(new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps_1), false)))(), getPropMetadata(type)); };
+        return factory(deps_1, type);
     }
     if (isValueProvider(provider)) {
         return function () { return provider.useValue; };
@@ -48,5 +60,5 @@ export function convertToFactory(type, provider) {
     }
     var _type = isClassProvider(provider) ? provider.useClass : type;
     var deps = hasDeps(provider) ? provider.deps : getDeps(_type);
-    return function () { return propArgs(new (_type.bind.apply(_type, __spreadArray([void 0], injectArgs(deps || []), false)))(), getPropMetadata(_type)); };
+    return factory(deps, _type);
 }

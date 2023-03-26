@@ -6,6 +6,7 @@ export var InjectFlags;
 (function (InjectFlags) {
     InjectFlags[InjectFlags["Default"] = 0] = "Default";
     InjectFlags[InjectFlags["Self"] = 2] = "Self";
+    InjectFlags[InjectFlags["NonCache"] = 16] = "NonCache";
 })(InjectFlags || (InjectFlags = {}));
 const NOT_YES = {};
 function makeRecord(factory, value = NOT_YES, multi = false) {
@@ -44,7 +45,7 @@ export class StaticInjector {
                 record = def && checkInjectableScope(this.scope, def) ? makeRecord(def.factory) : null;
                 this.records.set(token, record || null);
             }
-            return record !== null ? this.hydrate(token, record) : flags & InjectFlags.Self ? null : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token);
+            return record !== null ? this.hydrate(record, flags) : flags & InjectFlags.Self ? record : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token, flags);
         }
         finally {
             saveCurrentInjector(reInjector);
@@ -71,17 +72,21 @@ export class StaticInjector {
         this._destroyed = true;
         this.records.clear();
     }
-    hydrate(token, record) {
-        if (record.value === NOT_YES) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            record.value = record.factory();
+    hydrate(record, flags = InjectFlags.Default) {
+        let value = record.value;
+        const isNoneCache = flags & InjectFlags.NonCache;
+        if (isNoneCache && value !== NOT_YES)
+            console.error('数据进行缓存: ' + value);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        if (value === NOT_YES || isNoneCache)
+            value = record.factory();
+        if (!isNoneCache) {
+            record.value = value;
+            if (typeof value === 'object' && value.destroy && !(value instanceof StaticInjector)) {
+                this.onDestroy.add(value);
+            }
         }
-        if (typeof record.value === 'object' &&
-            record.value.destroy &&
-            !(record.value instanceof StaticInjector)) {
-            this.onDestroy.add(record.value);
-        }
-        return record.value;
+        return value;
     }
 }
 export function createInjector(providers, parent) {

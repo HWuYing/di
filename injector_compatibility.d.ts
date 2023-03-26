@@ -11,4 +11,5 @@ export declare function saveCurrentInjector(ɵɵinject: Injector): Injector;
 export declare function attachInjectFlag(decorator: any, flag: number): any;
 export declare function getInjectFlag(token: any): number | undefined;
 export declare function injectArgs(types: any[]): any[];
+export type TransformProp = (type: any, name: string, value: any) => any;
 export declare function propArgs(type: any, propMetadata: any): any;

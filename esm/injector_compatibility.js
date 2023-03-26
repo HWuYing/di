@@ -32,20 +32,20 @@ export function injectArgs(types) {
     });
     return args;
 }
+const defaultTransform = (type, name, value) => value !== undefined && (type[name] = value);
 export function propArgs(type, propMetadata) {
-    const props = {};
     Object.keys(propMetadata).forEach((prop) => {
-        const arrMetadata = propMetadata[prop];
         let flags = 0;
+        let transform;
         let token = undefined;
-        arrMetadata.forEach((meta) => {
+        propMetadata[prop].forEach((meta) => {
             const flag = getInjectFlag(meta);
+            transform = meta.transform || defaultTransform;
             if (typeof flag !== 'number')
                 return token = meta;
             flag === -1 /* DecoratorPropFlags.Prop */ ? token = meta.token : flags = flags | flag;
         });
-        const value = ɵɵinject(token, flags);
-        typeof value !== 'undefined' && (props[prop] = value);
+        transform(type, prop, ɵɵinject(token, flags));
     });
-    return Object.assign(type, props);
+    return type;
 }

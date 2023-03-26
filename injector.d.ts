@@ -2,7 +2,8 @@ import { Injector } from './injector.abstract';
 import { Provider, TokenKey, Type } from './type-api';
 export declare enum InjectFlags {
     Default = 0,
-    Self = 2
+    Self = 2,
+    NonCache = 16
 }
 export declare class StaticInjector {
     protected parent?: Injector;
