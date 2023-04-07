@@ -74,16 +74,16 @@ function makeParamDecorator(name, props) {
 exports.makeParamDecorator = makeParamDecorator;
 function makeMethodDecorator(name, props, typeFn) {
     var metaCtor = makeMetadataCtor(props);
-    function MethodDecoratorFafctory() {
+    function MethodDecoratorFactory() {
         var _a;
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        if (this instanceof MethodDecoratorFafctory) {
+        if (this instanceof MethodDecoratorFactory) {
             return metaCtor.apply(this, args);
         }
-        var annotationInstance = new ((_a = MethodDecoratorFafctory).bind.apply(_a, tslib_1.__spreadArray([void 0], args, false)))();
+        var annotationInstance = new ((_a = MethodDecoratorFactory).bind.apply(_a, tslib_1.__spreadArray([void 0], args, false)))();
         function MethodDecorator(_a, method, descriptor) {
             var constructor = _a.constructor;
             var methods = hasOwnProperty(constructor, exports.METHODS) ? constructor[exports.METHODS] : Object.defineProperty(constructor, exports.METHODS, { value: [] })[exports.METHODS];
@@ -93,8 +93,8 @@ function makeMethodDecorator(name, props, typeFn) {
         MethodDecorator.annotation = annotationInstance;
         return MethodDecorator;
     }
-    MethodDecoratorFafctory.prototype.metadataName = name;
-    return MethodDecoratorFafctory;
+    MethodDecoratorFactory.prototype.metadataName = name;
+    return MethodDecoratorFactory;
 }
 exports.makeMethodDecorator = makeMethodDecorator;
 function makePropDecorator(name, props, typeFn) {

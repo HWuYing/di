@@ -54,11 +54,11 @@ export function makeParamDecorator(name, props) {
 }
 export function makeMethodDecorator(name, props, typeFn) {
     const metaCtor = makeMetadataCtor(props);
-    function MethodDecoratorFafctory(...args) {
-        if (this instanceof MethodDecoratorFafctory) {
+    function MethodDecoratorFactory(...args) {
+        if (this instanceof MethodDecoratorFactory) {
             return metaCtor.apply(this, args);
         }
-        const annotationInstance = new MethodDecoratorFafctory(...args);
+        const annotationInstance = new MethodDecoratorFactory(...args);
         function MethodDecorator({ constructor }, method, descriptor) {
             const methods = hasOwnProperty(constructor, METHODS) ? constructor[METHODS] : Object.defineProperty(constructor, METHODS, { value: [] })[METHODS];
             methods.push({ method, descriptor, annotationInstance });
@@ -67,8 +67,8 @@ export function makeMethodDecorator(name, props, typeFn) {
         MethodDecorator.annotation = annotationInstance;
         return MethodDecorator;
     }
-    MethodDecoratorFafctory.prototype.metadataName = name;
-    return MethodDecoratorFafctory;
+    MethodDecoratorFactory.prototype.metadataName = name;
+    return MethodDecoratorFactory;
 }
 export function makePropDecorator(name, props, typeFn) {
     const metaCtor = makeMetadataCtor(props);
