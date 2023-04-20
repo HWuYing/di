@@ -1,7 +1,12 @@
 import 'reflect-metadata';
 import { Type } from './type-api';
-export declare class ReflectionCapabilities {
+declare class ReflectionCapabilities {
     private _reflect;
+    getParamAnnotations(type: Type<any>, methodName?: string): any[];
+    getMethodAnnotations(type: Type<any>, methodName: string): any;
+    getPropAnnotations(type: Type<any>, propName: string): any[];
     parameters(type: Type<any>): any[];
-    propMetadata(type: Type<any>): any;
+    properties(type: Type<any>): any;
 }
+export declare const reflectCapabilities: ReflectionCapabilities;
+export {};

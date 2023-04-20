@@ -4,15 +4,11 @@ exports.convertToFactory = exports.isClassProvider = void 0;
 var tslib_1 = require("tslib");
 var injector_compatibility_1 = require("./injector_compatibility");
 var reflection_capabilities_1 = require("./reflection-capabilities");
-var _reflect = null;
-function getReflect() {
-    return (_reflect = _reflect || new reflection_capabilities_1.ReflectionCapabilities());
-}
 function getDeps(type) {
-    return getReflect().parameters(type);
+    return reflection_capabilities_1.reflectCapabilities.parameters(type);
 }
 function getPropMetadata(type) {
-    return getReflect().propMetadata(type);
+    return reflection_capabilities_1.reflectCapabilities.properties(type);
 }
 function isValueProvider(value) {
     return !!(value && typeof value === 'object' && value.useValue);
@@ -36,8 +32,7 @@ function factory(deps, type) {
     return function () {
         if (_m !== empty)
             return _m;
-        var m = new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps), false)))();
-        (0, injector_compatibility_1.propArgs)(_m = m, getPropMetadata(type));
+        var m = (0, injector_compatibility_1.propArgs)(_m = new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps), false)))(), getPropMetadata(type));
         _m = empty;
         return m;
     };

@@ -1,15 +1,11 @@
 import { __spreadArray } from "tslib";
 import { injectArgs, ɵɵinject, propArgs } from './injector_compatibility';
-import { ReflectionCapabilities } from './reflection-capabilities';
-var _reflect = null;
-function getReflect() {
-    return (_reflect = _reflect || new ReflectionCapabilities());
-}
+import { reflectCapabilities } from './reflection-capabilities';
 function getDeps(type) {
-    return getReflect().parameters(type);
+    return reflectCapabilities.parameters(type);
 }
 function getPropMetadata(type) {
-    return getReflect().propMetadata(type);
+    return reflectCapabilities.properties(type);
 }
 function isValueProvider(value) {
     return !!(value && typeof value === 'object' && value.useValue);
@@ -32,8 +28,7 @@ function factory(deps, type) {
     return function () {
         if (_m !== empty)
             return _m;
-        var m = new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps), false)))();
-        propArgs(_m = m, getPropMetadata(type));
+        var m = propArgs(_m = new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps), false)))(), getPropMetadata(type));
         _m = empty;
         return m;
     };

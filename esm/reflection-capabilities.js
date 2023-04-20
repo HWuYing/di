@@ -1,19 +1,44 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-prototype-builtins */
 import 'reflect-metadata';
-import { PARAMETERS, PROP_METADATA } from './decorators';
+import { METHODS, PARAMETERS, PROP_METADATA } from './decorators';
 const designParamtypes = `design:paramtypes`;
-// eslint-disable-next-line @typescript-eslint/ban-types
 function getParentCtor(ctor) {
     const parentProto = ctor.prototype ? Object.getPrototypeOf(ctor.prototype) : null;
     const parentCtor = parentProto ? parentProto.constructor : null;
     return parentCtor || Object;
 }
-export class ReflectionCapabilities {
+class ReflectionCapabilities {
     constructor() {
         this._reflect = typeof global === 'object' ? global.Reflect : typeof self === 'object' ? self.Reflect : Reflect;
     }
+    getParamAnnotations(type, methodName = 'constructor') {
+        const metadata = type.hasOwnProperty(PARAMETERS) && type[PARAMETERS] || [];
+        const paramAnnotations = [];
+        metadata.forEach(({ method, annotationInstance, index }) => {
+            if (method === methodName) {
+                while (paramAnnotations.length <= index)
+                    paramAnnotations.push(null);
+                (paramAnnotations[index] = paramAnnotations[index] || []).push(annotationInstance);
+            }
+        });
+        return paramAnnotations;
+    }
+    getMethodAnnotations(type, methodName) {
+        const metadata = type.hasOwnProperty(METHODS) && type[METHODS] || [];
+        const methodAnnotations = [];
+        metadata.forEach((item) => item.method === methodName && methodAnnotations.unshift(item));
+        return methodAnnotations;
+    }
+    getPropAnnotations(type, propName) {
+        const metadata = type.hasOwnProperty(PROP_METADATA) && type[PROP_METADATA] || [];
+        const propAnnotations = [];
+        metadata.forEach(({ prop, annotationInstance }) => prop === propName && propAnnotations.push(annotationInstance));
+        return propAnnotations;
+    }
     parameters(type) {
-        // eslint-disable-next-line no-prototype-builtins
-        const paramAnnotations = type.hasOwnProperty(PARAMETERS) && type[PARAMETERS];
+        const paramAnnotations = this.getParamAnnotations(type);
         const paramTypes = this._reflect.getMetadata(designParamtypes, type);
         const maxLength = Math.max((paramTypes || paramAnnotations || []).length);
         const result = new Array(maxLength).fill([], 0, maxLength);
@@ -27,18 +52,17 @@ export class ReflectionCapabilities {
         }
         return result;
     }
-    propMetadata(type) {
-        const stack = [{ typeFunc: type }];
+    properties(type) {
+        const stack = [type];
         const propMetadata = {};
         while (stack.length) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const { typeFunc } = stack.shift();
-            // eslint-disable-next-line no-prototype-builtins
-            const metadata = typeFunc.hasOwnProperty(PROP_METADATA) && typeFunc[PROP_METADATA];
-            Object.keys(metadata).forEach((key) => propMetadata[key] ? undefined : propMetadata[key] = metadata[key]);
+            const typeFunc = stack.shift();
+            const metadata = typeFunc.hasOwnProperty(PROP_METADATA) && typeFunc[PROP_METADATA] || [];
+            metadata.forEach(({ prop, annotationInstance }) => (propMetadata[prop] = propMetadata[prop] || []).push(annotationInstance));
             if (getParentCtor(typeFunc) !== Object)
-                stack.push({ typeFunc: getParentCtor(typeFunc) });
+                stack.push(getParentCtor(typeFunc));
         }
         return propMetadata;
     }
 }
+export const reflectCapabilities = new ReflectionCapabilities();

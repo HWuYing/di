@@ -1,12 +1,15 @@
 import { __assign } from "tslib";
 import { makeDecorator, makeParamDecorator, makePropDecorator } from './decorators';
-import { setInjectableDef } from './def';
+import { setInjectableDef as _setInjectableDef } from './def';
 import { attachInjectFlag } from './injector_compatibility';
 import { convertToFactory } from './util';
 export var ROOT_SCOPE = 'root';
-export var Injectable = makeDecorator('Injectable', function (ref) { return ref; }, function (injectableType, meta) {
-    var provDef = { token: injectableType, providedIn: (meta === null || meta === void 0 ? void 0 : meta.providedIn) || ROOT_SCOPE, factory: convertToFactory(injectableType, meta) };
-    setInjectableDef(injectableType, provDef);
+export var setInjectableDef = function (type, provider) {
+    var _a = (provider || {}).providedIn, providedIn = _a === void 0 ? ROOT_SCOPE : _a;
+    return _setInjectableDef(type, { token: type, providedIn: providedIn, factory: convertToFactory(type, provider) });
+};
+export var Injectable = makeDecorator('Injectable', undefined, function (injectableType, meta) {
+    setInjectableDef(injectableType, meta);
 });
 var mergeInfo = function (token, options) {
     if (options === void 0) { options = {}; }

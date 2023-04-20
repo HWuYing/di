@@ -36,13 +36,14 @@ export function makeDecorator(name, props, typeFn) {
         return function TypeDecorator(cls) {
             var annotations = hasOwnProperty(cls, ANNOTATIONS) ? cls[ANNOTATIONS] : Object.defineProperty(cls, ANNOTATIONS, { value: [] })[ANNOTATIONS];
             annotations.push(annotationInstance);
-            return typeFn && typeFn.apply(void 0, __spreadArray([cls], args, false)) || cls;
+            typeFn && typeFn.apply(void 0, __spreadArray([cls], args, false));
+            return cls;
         };
     }
     DecoratorFactory.prototype.metadataName = name;
     return DecoratorFactory;
 }
-export function makeParamDecorator(name, props) {
+export function makeParamDecorator(name, props, typeFn) {
     var metaCtor = makeMetadataCtor(props);
     function ParamDecoratorFactory() {
         var _a;
@@ -54,12 +55,11 @@ export function makeParamDecorator(name, props) {
             return metaCtor.apply(this, args);
         }
         var annotationInstance = new ((_a = ParamDecoratorFactory).bind.apply(_a, __spreadArray([void 0], args, false)))();
-        function ParamDecorator(cls, name, index) {
-            var parameters = hasOwnProperty(cls, PARAMETERS) ? cls[PARAMETERS] : Object.defineProperty(cls, PARAMETERS, { value: [] })[PARAMETERS];
-            while (parameters.length <= index)
-                parameters.push(null);
-            (parameters[index] = parameters[index] || []).push(annotationInstance);
-            return cls;
+        function ParamDecorator(cls, method, index) {
+            var ctor = method ? cls.constructor : cls;
+            var parameters = hasOwnProperty(ctor, PARAMETERS) ? ctor[PARAMETERS] : Object.defineProperty(ctor, PARAMETERS, { value: [] })[PARAMETERS];
+            parameters.unshift({ method: method || 'constructor', index: index, annotationInstance: annotationInstance });
+            typeFn && typeFn.apply(void 0, __spreadArray([ctor, method, index], args, false));
         }
         ParamDecorator.annotation = annotationInstance;
         return ParamDecorator;
@@ -104,12 +104,12 @@ export function makePropDecorator(name, props, typeFn) {
         }
         var annotationInstance = new ((_a = PropDecoratorFactory).bind.apply(_a, __spreadArray([void 0], args, false)))();
         function PropDecorator(_a, prop) {
-            var constructor = _a.constructor;
-            var meta = hasOwnProperty(constructor, PROP_METADATA) ? constructor[PROP_METADATA] : Object.defineProperty(constructor, PROP_METADATA, { value: {} })[PROP_METADATA];
-            meta[prop] = hasOwnProperty(meta, prop) && meta[prop] || [];
-            meta[prop].unshift(annotationInstance);
-            typeFn && typeFn.apply(void 0, __spreadArray([constructor, prop], args, false));
+            var ctor = _a.constructor;
+            var meta = hasOwnProperty(ctor, PROP_METADATA) ? ctor[PROP_METADATA] : Object.defineProperty(ctor, PROP_METADATA, { value: [] })[PROP_METADATA];
+            meta.unshift({ prop: prop, annotationInstance: annotationInstance });
+            typeFn && typeFn.apply(void 0, __spreadArray([ctor, prop], args, false));
         }
+        PropDecorator.annotation = annotationInstance;
         return PropDecorator;
     }
     PropDecoratorFactory.prototype.metadataName = name;
