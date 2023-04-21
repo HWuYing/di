@@ -39,11 +39,14 @@ export class StaticInjector {
             if (this.destroyed) {
                 return null;
             }
-            let record = this.records.get(token);
+            let record = this.records.get(token) || null;
             if (!record) {
                 const def = getInjectableDef(token);
-                record = def && checkInjectableScope(this.scope, def) ? makeRecord(def.factory) : null;
-                this.records.set(token, record || null);
+                if (def && checkInjectableScope(this.scope, def)) {
+                    record = makeRecord(def.factory);
+                    record.flags = def.flags;
+                }
+                this.records.set(token, record);
             }
             return record !== null ? this.hydrate(record, flags) : flags & InjectFlags.Self ? record : (_a = this.parent) === null || _a === void 0 ? void 0 : _a.get(token, flags);
         }
@@ -74,7 +77,8 @@ export class StaticInjector {
     }
     hydrate(record, flags = InjectFlags.Default) {
         let value = record.value;
-        const isNoneCache = flags & InjectFlags.NonCache;
+        const _flags = (record.flags || InjectFlags.Default) | flags;
+        const isNoneCache = _flags & InjectFlags.NonCache;
         if (isNoneCache && value !== NOT_YES)
             console.error('数据进行缓存: ' + value);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
