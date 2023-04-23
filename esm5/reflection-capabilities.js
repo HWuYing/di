@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-prototype-builtins */
 import 'reflect-metadata';
-import { METHODS, PARAMETERS, PROP_METADATA } from './decorators';
+import { ANNOTATIONS, METHODS, PARAMETERS, PROP_METADATA } from './decorators';
 var designParamtypes = "design:paramtypes";
 function getParentCtor(ctor) {
     var parentProto = ctor.prototype ? Object.getPrototypeOf(ctor.prototype) : null;
@@ -13,6 +13,13 @@ var ReflectionCapabilities = /** @class */ (function () {
     function ReflectionCapabilities() {
         this._reflect = typeof global === 'object' ? global.Reflect : typeof self === 'object' ? self.Reflect : Reflect;
     }
+    ReflectionCapabilities.prototype.getAnnotation = function (type, metadataName) {
+        var metadata = type.hasOwnProperty(ANNOTATIONS) && type[ANNOTATIONS] || [];
+        return metadata.find(function (_a) {
+            var name = _a.metadataName;
+            return metadataName === name;
+        });
+    };
     ReflectionCapabilities.prototype.getParamAnnotations = function (type, methodName) {
         if (methodName === void 0) { methodName = 'constructor'; }
         var metadata = type.hasOwnProperty(PARAMETERS) && type[PARAMETERS] || [];

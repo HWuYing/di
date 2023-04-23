@@ -7,7 +7,7 @@ var injector_token_1 = require("./injector-token");
 var Injector = /** @class */ (function () {
     function Injector() {
     }
-    Injector.__prov_def__ = { token: Injector, providedIn: 'any', factory: function () { return (0, injector_compatibility_1.ɵɵinject)(injector_token_1.INJECTOR); } };
+    Injector.__prov_def__ = { token: Injector, providedIn: 'any', factory: function () { return (0, injector_compatibility_1.ɵɵInject)(injector_token_1.INJECTOR); } };
     Injector.create = function (providers, parent) { return (0, injector_1.createInjector)(providers, parent); };
     return Injector;
 }());

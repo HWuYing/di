@@ -11,9 +11,7 @@ export var setInjectableDef = function (type, provider) {
     nonSingle && (injectableDef.flags = InjectFlags.NonCache);
     return _setInjectableDef(type, injectableDef);
 };
-export var Injectable = makeDecorator('Injectable', undefined, function (injectableType, meta) {
-    setInjectableDef(injectableType, meta);
-});
+export var Injectable = makeDecorator('Injectable', undefined, setInjectableDef);
 var mergeInfo = function (token, options) {
     if (options === void 0) { options = {}; }
     return (__assign(__assign({}, options), { token: token }));

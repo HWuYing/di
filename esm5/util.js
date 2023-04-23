@@ -1,5 +1,5 @@
 import { __spreadArray } from "tslib";
-import { injectArgs, ɵɵinject, propArgs } from './injector_compatibility';
+import { injectArgs, ɵɵInject, propArgs } from './injector_compatibility';
 import { reflectCapabilities } from './reflection-capabilities';
 function getDeps(type) {
     return reflectCapabilities.parameters(type);
@@ -42,7 +42,7 @@ export function convertToFactory(type, provider) {
         return function () { return provider.useValue; };
     }
     if (isExistingProvider(provider)) {
-        return function () { return ɵɵinject(provider.useExisting); };
+        return function () { return ɵɵInject(provider.useExisting); };
     }
     if (isFactoryProvider(provider)) {
         return function () {

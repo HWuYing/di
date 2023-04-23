@@ -10,9 +10,7 @@ export const setInjectableDef = (type, provider) => {
     nonSingle && (injectableDef.flags = InjectFlags.NonCache);
     return _setInjectableDef(type, injectableDef);
 };
-export const Injectable = makeDecorator('Injectable', undefined, (injectableType, meta) => {
-    setInjectableDef(injectableType, meta);
-});
+export const Injectable = makeDecorator('Injectable', undefined, setInjectableDef);
 const mergeInfo = (token, options = {}) => (Object.assign(Object.assign({}, options), { token }));
 export const Inject = attachInjectFlag(makeParamDecorator('Inject', mergeInfo), -1 /* DecoratorFlags.Inject */);
 export const Prop = attachInjectFlag(makePropDecorator('Prop', mergeInfo), -1 /* DecoratorPropFlags.Prop */);

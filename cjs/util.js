@@ -46,7 +46,7 @@ function convertToFactory(type, provider) {
         return function () { return provider.useValue; };
     }
     if (isExistingProvider(provider)) {
-        return function () { return (0, injector_compatibility_1.ɵɵinject)(provider.useExisting); };
+        return function () { return (0, injector_compatibility_1.ɵɵInject)(provider.useExisting); };
     }
     if (isFactoryProvider(provider)) {
         return function () {

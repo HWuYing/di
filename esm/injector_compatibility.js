@@ -1,11 +1,11 @@
 const DI_DECORATOR_FLAG = '__DI_FLAG__';
 let injector = null;
-export function ɵɵinject(token, flags) {
+export function ɵɵInject(token, flags) {
     return injector === null || injector === void 0 ? void 0 : injector.get(token, flags);
 }
-export function saveCurrentInjector(ɵɵinject) {
+export function saveCurrentInjector(_inject) {
     const preInjector = injector;
-    injector = ɵɵinject;
+    injector = _inject;
     return preInjector;
 }
 export function attachInjectFlag(decorator, flag) {
@@ -16,36 +16,33 @@ export function attachInjectFlag(decorator, flag) {
 export function getInjectFlag(token) {
     return token[DI_DECORATOR_FLAG];
 }
-export function injectArgs(types) {
-    const args = [];
-    types.forEach((arg) => {
-        const argArray = Array.isArray(arg) ? arg : [arg];
+function factoryMetaToValue(_transform, tokeFlags) {
+    return function (metaList, handler) {
         let flags = 0;
         let token = undefined;
-        argArray.forEach((meta) => {
+        const transformFunc = [];
+        metaList.forEach((meta) => {
             const flag = getInjectFlag(meta);
+            transformFunc.push(meta.transform || _transform);
             if (typeof flag !== 'number')
                 return token = meta;
-            flag === -1 /* DecoratorFlags.Inject */ ? token = meta.token : flags = flags | flag;
+            flag === tokeFlags ? token = meta.token : flags = flags | flag;
         });
-        args.push(ɵɵinject(token, flags));
-    });
-    return args;
+        let value = ɵɵInject(token, flags);
+        while (transformFunc.length)
+            value = handler(transformFunc.pop(), value);
+        return value;
+    };
 }
-const defaultTransform = (type, name, value) => value !== undefined && (type[name] = value);
+const argsMetaToValue = factoryMetaToValue((value) => value, -1 /* DecoratorFlags.Inject */);
+export function injectArgs(types) {
+    const handler = (transform, value) => transform(value);
+    return types.map((arg) => argsMetaToValue(Array.isArray(arg) ? arg : [arg], handler));
+}
+const propMetaToValue = factoryMetaToValue((type, name, value) => value, -1 /* DecoratorPropFlags.Prop */);
 export function propArgs(type, propMetadata) {
     Object.keys(propMetadata).forEach((prop) => {
-        let flags = 0;
-        let transform;
-        let token = undefined;
-        propMetadata[prop].forEach((meta) => {
-            const flag = getInjectFlag(meta);
-            transform = meta.transform || defaultTransform;
-            if (typeof flag !== 'number')
-                return token = meta;
-            flag === -1 /* DecoratorPropFlags.Prop */ ? token = meta.token : flags = flags | flag;
-        });
-        transform(type, prop, ɵɵinject(token, flags));
+        type[prop] = propMetaToValue(propMetadata[prop], (transform, value) => transform(type, prop, value));
     });
     return type;
 }

@@ -1,4 +1,4 @@
-import { injectArgs, ɵɵinject, propArgs } from './injector_compatibility';
+import { injectArgs, ɵɵInject, propArgs } from './injector_compatibility';
 import { reflectCapabilities } from './reflection-capabilities';
 function getDeps(type) {
     return reflectCapabilities.parameters(type);
@@ -41,7 +41,7 @@ export function convertToFactory(type, provider) {
         return () => provider.useValue;
     }
     if (isExistingProvider(provider)) {
-        return () => ɵɵinject(provider.useExisting);
+        return () => ɵɵInject(provider.useExisting);
     }
     if (isFactoryProvider(provider)) {
         return (...params) => provider.useFactory(...injectArgs(provider.deps || []), ...params);

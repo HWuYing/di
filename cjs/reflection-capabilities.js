@@ -16,6 +16,13 @@ var ReflectionCapabilities = /** @class */ (function () {
     function ReflectionCapabilities() {
         this._reflect = typeof global === 'object' ? global.Reflect : typeof self === 'object' ? self.Reflect : Reflect;
     }
+    ReflectionCapabilities.prototype.getAnnotation = function (type, metadataName) {
+        var metadata = type.hasOwnProperty(decorators_1.ANNOTATIONS) && type[decorators_1.ANNOTATIONS] || [];
+        return metadata.find(function (_a) {
+            var name = _a.metadataName;
+            return metadataName === name;
+        });
+    };
     ReflectionCapabilities.prototype.getParamAnnotations = function (type, methodName) {
         if (methodName === void 0) { methodName = 'constructor'; }
         var metadata = type.hasOwnProperty(decorators_1.PARAMETERS) && type[decorators_1.PARAMETERS] || [];
