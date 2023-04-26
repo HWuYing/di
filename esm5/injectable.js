@@ -1,5 +1,5 @@
 import { __assign } from "tslib";
-import { makeDecorator, makeParamDecorator, makePropDecorator } from './decorators';
+import { makeDecorator, makeParamDecorator } from './decorators';
 import { setInjectableDef as _setInjectableDef } from './def';
 import { InjectFlags } from './injector';
 import { attachInjectFlag } from './injector_compatibility';
@@ -17,4 +17,3 @@ var mergeInfo = function (token, options) {
     return (__assign(__assign({}, options), { token: token }));
 };
 export var Inject = attachInjectFlag(makeParamDecorator('Inject', mergeInfo), -1 /* DecoratorFlags.Inject */);
-export var Prop = attachInjectFlag(makePropDecorator('Prop', mergeInfo), -1 /* DecoratorPropFlags.Prop */);

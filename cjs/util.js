@@ -28,12 +28,19 @@ function isClassProvider(value) {
 exports.isClassProvider = isClassProvider;
 var empty = {};
 function factory(deps, type) {
-    var _m = empty;
+    var map = new Map();
     return function () {
-        if (_m !== empty)
-            return _m;
-        var m = (0, injector_compatibility_1.propArgs)(_m = new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps), false)))(), getPropMetadata(type));
-        _m = empty;
+        var currentInjector = (0, injector_compatibility_1.getCurrentInjector)();
+        var cache = map.get(currentInjector) || { _m: empty, pending: false };
+        if (cache._m !== empty)
+            return cache._m;
+        if (cache.pending)
+            return cache._m = Object.create(type.prototype);
+        map.set(currentInjector, cache);
+        cache.pending = true;
+        var cls = new (type.bind.apply(type, tslib_1.__spreadArray([void 0], (0, injector_compatibility_1.injectArgs)(deps), false)))();
+        var m = (0, injector_compatibility_1.propArgs)(cache._m = cache._m !== empty ? Object.assign(cache._m, cls) : cls, getPropMetadata(type));
+        map.delete(currentInjector);
         return m;
     };
 }

@@ -1,5 +1,5 @@
 import { __spreadArray } from "tslib";
-import { injectArgs, ɵɵInject, propArgs } from './injector_compatibility';
+import { getCurrentInjector, injectArgs, ɵɵInject, propArgs } from './injector_compatibility';
 import { reflectCapabilities } from './reflection-capabilities';
 function getDeps(type) {
     return reflectCapabilities.parameters(type);
@@ -24,12 +24,19 @@ export function isClassProvider(value) {
 }
 var empty = {};
 function factory(deps, type) {
-    var _m = empty;
+    var map = new Map();
     return function () {
-        if (_m !== empty)
-            return _m;
-        var m = propArgs(_m = new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps), false)))(), getPropMetadata(type));
-        _m = empty;
+        var currentInjector = getCurrentInjector();
+        var cache = map.get(currentInjector) || { _m: empty, pending: false };
+        if (cache._m !== empty)
+            return cache._m;
+        if (cache.pending)
+            return cache._m = Object.create(type.prototype);
+        map.set(currentInjector, cache);
+        cache.pending = true;
+        var cls = new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps), false)))();
+        var m = propArgs(cache._m = cache._m !== empty ? Object.assign(cache._m, cls) : cls, getPropMetadata(type));
+        map.delete(currentInjector);
         return m;
     };
 }

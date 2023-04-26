@@ -1,4 +1,4 @@
-import { makeDecorator, makeParamDecorator, makePropDecorator } from './decorators';
+import { makeDecorator, makeParamDecorator } from './decorators';
 import { setInjectableDef as _setInjectableDef } from './def';
 import { InjectFlags } from './injector';
 import { attachInjectFlag } from './injector_compatibility';
@@ -13,4 +13,3 @@ export const setInjectableDef = (type, provider) => {
 export const Injectable = makeDecorator('Injectable', undefined, setInjectableDef);
 const mergeInfo = (token, options = {}) => (Object.assign(Object.assign({}, options), { token }));
 export const Inject = attachInjectFlag(makeParamDecorator('Inject', mergeInfo), -1 /* DecoratorFlags.Inject */);
-export const Prop = attachInjectFlag(makePropDecorator('Prop', mergeInfo), -1 /* DecoratorPropFlags.Prop */);

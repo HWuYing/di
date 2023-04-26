@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Prop = exports.Inject = exports.Injectable = exports.setInjectableDef = exports.ROOT_SCOPE = void 0;
+exports.Inject = exports.Injectable = exports.setInjectableDef = exports.ROOT_SCOPE = void 0;
 var tslib_1 = require("tslib");
 var decorators_1 = require("./decorators");
 var def_1 = require("./def");
@@ -21,4 +21,3 @@ var mergeInfo = function (token, options) {
     return (tslib_1.__assign(tslib_1.__assign({}, options), { token: token }));
 };
 exports.Inject = (0, injector_compatibility_1.attachInjectFlag)((0, decorators_1.makeParamDecorator)('Inject', mergeInfo), -1 /* DecoratorFlags.Inject */);
-exports.Prop = (0, injector_compatibility_1.attachInjectFlag)((0, decorators_1.makePropDecorator)('Prop', mergeInfo), -1 /* DecoratorPropFlags.Prop */);
