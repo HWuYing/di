@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertToFactory = exports.reflectCapabilities = exports.InjectorToken = exports.INJECTOR_SCOPE = exports.forwardRef = exports.Injector = exports.InjectFlags = exports.setInjectableDef = exports.ROOT_SCOPE = exports.Injectable = exports.Inject = exports.INJECTOR_PROV_DEF = exports.getInjectableDef = exports.makePropDecorator = exports.makeParamDecorator = exports.makeMethodDecorator = exports.makeDecorator = void 0;
+exports.convertToFactory = exports.reflectCapabilities = exports.MethodProxy = exports.InjectorToken = exports.INJECTOR_SCOPE = exports.forwardRef = exports.Injector = exports.InjectFlags = exports.setInjectableDef = exports.ROOT_SCOPE = exports.Injectable = exports.Inject = exports.INJECTOR_PROV_DEF = exports.getInjectableDef = exports.makePropDecorator = exports.makeParamDecorator = exports.makeMethodDecorator = exports.makeDecorator = void 0;
 var decorators_1 = require("./decorators");
 Object.defineProperty(exports, "makeDecorator", { enumerable: true, get: function () { return decorators_1.makeDecorator; } });
 Object.defineProperty(exports, "makeMethodDecorator", { enumerable: true, get: function () { return decorators_1.makeMethodDecorator; } });
@@ -23,6 +23,8 @@ Object.defineProperty(exports, "forwardRef", { enumerable: true, get: function (
 var injector_token_1 = require("./injector-token");
 Object.defineProperty(exports, "INJECTOR_SCOPE", { enumerable: true, get: function () { return injector_token_1.INJECTOR_SCOPE; } });
 Object.defineProperty(exports, "InjectorToken", { enumerable: true, get: function () { return injector_token_1.InjectorToken; } });
+var method_proxy_1 = require("./method-proxy");
+Object.defineProperty(exports, "MethodProxy", { enumerable: true, get: function () { return method_proxy_1.MethodProxy; } });
 var reflection_capabilities_1 = require("./reflection-capabilities");
 Object.defineProperty(exports, "reflectCapabilities", { enumerable: true, get: function () { return reflection_capabilities_1.reflectCapabilities; } });
 var util_1 = require("./util");

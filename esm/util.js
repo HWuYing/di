@@ -15,26 +15,35 @@ function isExistingProvider(value) {
 function isFactoryProvider(value) {
     return !!(value && value.useFactory);
 }
+function isClassProvider(value) {
+    return !!(value && value.useClass);
+}
 function hasDeps(value) {
     return !!(value && value.deps);
 }
-export function isClassProvider(value) {
-    return !!(value && value.useClass);
+function createProxy(cache, type) {
+    let obj = Object.create(type.prototype);
+    const proxy = new Proxy(obj, {
+        set: (_target, props, value) => obj[props] = value,
+        get: (_target, props) => {
+            return typeof obj[props] === 'function' ? (...args) => obj[props](...args) : obj[props];
+        }
+    });
+    return Object.defineProperty(cache, 'proxy', { get: () => proxy, set: (value) => obj = value });
 }
-const empty = {};
 function factory(deps, type) {
+    const empty = {};
     const map = new Map();
     return () => {
         const currentInjector = getCurrentInjector();
-        const cache = map.get(currentInjector) || { _m: empty, pending: false };
-        if (cache._m !== empty)
-            return cache._m;
+        const cache = map.get(currentInjector) || { proxy: empty, pending: false };
+        if (cache.proxy !== empty)
+            return cache.proxy;
         if (cache.pending)
-            return cache._m = Object.create(type.prototype);
+            return createProxy(cache, type).proxy;
         map.set(currentInjector, cache);
         cache.pending = true;
-        const cls = new type(...injectArgs(deps));
-        const m = propArgs(cache._m = cache._m !== empty ? Object.assign(cache._m, cls) : cls, getPropMetadata(type));
+        const m = propArgs(cache.proxy = new type(...injectArgs(deps)), getPropMetadata(type));
         map.delete(currentInjector);
         return m;
     };

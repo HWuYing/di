@@ -1,3 +1,4 @@
+import { __spreadArray } from "tslib";
 var FORWARD_REF = '__forward__ref__';
 var DI_DECORATOR_FLAG = '__DI_FLAG__';
 var injector = null;
@@ -28,30 +29,37 @@ function factoryMetaToValue(_transform, tokeFlags) {
     return function (metaList, handler) {
         var flags = 0;
         var token = undefined;
-        var transformFunc = [];
+        var metaCache = [];
         metaList.forEach(function (meta) {
             var flag = getInjectFlag(meta);
-            transformFunc.push(meta.transform || _transform);
+            metaCache.push([meta.transform || _transform, meta]);
             if (typeof flag !== 'number')
                 return token = meta;
             flag === tokeFlags ? token = meta.token : flags = flags | flag;
-            token = getInjectFlag(token) === FORWARD_REF && typeof token === 'function' ? token() : token;
+            token = typeof token === 'function' && getInjectFlag(token) === FORWARD_REF ? token() : token;
         });
         var value = ɵɵInject(token, flags);
-        while (transformFunc.length)
-            value = handler(transformFunc.pop(), value);
+        while (metaCache.length) {
+            var _a = metaCache.pop(), transformFunc = _a[0], meta = _a[1];
+            value = handler(transformFunc, meta, value);
+        }
         return value;
     };
 }
-var argsMetaToValue = factoryMetaToValue(function (value) { return value; }, -1 /* DecoratorFlags.Inject */);
+var argsMetaToValue = factoryMetaToValue(function (_meta, value) { return value; }, -1 /* DecoratorFlags.Inject */);
 export function injectArgs(types) {
-    var handler = function (transform, value) { return transform(value); };
+    var args = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        args[_i - 1] = arguments[_i];
+    }
+    var handler = function (transform, meta, value) { return transform.apply(void 0, __spreadArray([meta, value], args, false)); };
     return types.map(function (arg) { return argsMetaToValue(Array.isArray(arg) ? arg : [arg], handler); });
 }
 var propMetaToValue = factoryMetaToValue(function (type, name, value) { return value; }, -1 /* DecoratorFlags.Inject */);
 export function propArgs(type, propMetadata) {
+    type.__ɵɵInject__ = injector;
     Object.keys(propMetadata).forEach(function (prop) {
-        type[prop] = propMetaToValue(propMetadata[prop], function (transform, value) { return transform(type, prop, value); });
+        type[prop] = propMetaToValue(propMetadata[prop], function (transform, _meta, value) { return transform(type, prop, value); });
     });
     return type;
 }

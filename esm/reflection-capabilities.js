@@ -17,7 +17,7 @@ class ReflectionCapabilities {
         const metadata = type.hasOwnProperty(ANNOTATIONS) && type[ANNOTATIONS] || [];
         return metadata.find(({ metadataName: name }) => metadataName === name);
     }
-    getParamAnnotations(type, methodName = 'constructor') {
+    getParamAnnotations(type, methodName) {
         const metadata = type.hasOwnProperty(PARAMETERS) && type[PARAMETERS] || [];
         const paramAnnotations = [];
         metadata.forEach(({ method, annotationInstance, index }) => {
@@ -42,7 +42,7 @@ class ReflectionCapabilities {
         return propAnnotations;
     }
     parameters(type) {
-        const paramAnnotations = this.getParamAnnotations(type);
+        const paramAnnotations = this.getParamAnnotations(type, 'constructor');
         const paramTypes = this._reflect.getMetadata(designParamtypes, type);
         const maxLength = Math.max((paramTypes || paramAnnotations || []).length);
         const result = new Array(maxLength).fill([], 0, maxLength);

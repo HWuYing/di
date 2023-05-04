@@ -28,30 +28,33 @@ function factoryMetaToValue(_transform, tokeFlags) {
     return function (metaList, handler) {
         let flags = 0;
         let token = undefined;
-        const transformFunc = [];
+        const metaCache = [];
         metaList.forEach((meta) => {
             const flag = getInjectFlag(meta);
-            transformFunc.push(meta.transform || _transform);
+            metaCache.push([meta.transform || _transform, meta]);
             if (typeof flag !== 'number')
                 return token = meta;
             flag === tokeFlags ? token = meta.token : flags = flags | flag;
-            token = getInjectFlag(token) === FORWARD_REF && typeof token === 'function' ? token() : token;
+            token = typeof token === 'function' && getInjectFlag(token) === FORWARD_REF ? token() : token;
         });
         let value = ɵɵInject(token, flags);
-        while (transformFunc.length)
-            value = handler(transformFunc.pop(), value);
+        while (metaCache.length) {
+            const [transformFunc, meta] = metaCache.pop();
+            value = handler(transformFunc, meta, value);
+        }
         return value;
     };
 }
-const argsMetaToValue = factoryMetaToValue((value) => value, -1 /* DecoratorFlags.Inject */);
-export function injectArgs(types) {
-    const handler = (transform, value) => transform(value);
+const argsMetaToValue = factoryMetaToValue((_meta, value) => value, -1 /* DecoratorFlags.Inject */);
+export function injectArgs(types, ...args) {
+    const handler = (transform, meta, value) => transform(meta, value, ...args);
     return types.map((arg) => argsMetaToValue(Array.isArray(arg) ? arg : [arg], handler));
 }
 const propMetaToValue = factoryMetaToValue((type, name, value) => value, -1 /* DecoratorFlags.Inject */);
 export function propArgs(type, propMetadata) {
+    type.__ɵɵInject__ = injector;
     Object.keys(propMetadata).forEach((prop) => {
-        type[prop] = propMetaToValue(propMetadata[prop], (transform, value) => transform(type, prop, value));
+        type[prop] = propMetaToValue(propMetadata[prop], (transform, _meta, value) => transform(type, prop, value));
     });
     return type;
 }

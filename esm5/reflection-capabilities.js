@@ -21,7 +21,6 @@ var ReflectionCapabilities = /** @class */ (function () {
         });
     };
     ReflectionCapabilities.prototype.getParamAnnotations = function (type, methodName) {
-        if (methodName === void 0) { methodName = 'constructor'; }
         var metadata = type.hasOwnProperty(PARAMETERS) && type[PARAMETERS] || [];
         var paramAnnotations = [];
         metadata.forEach(function (_a) {
@@ -50,7 +49,7 @@ var ReflectionCapabilities = /** @class */ (function () {
         return propAnnotations;
     };
     ReflectionCapabilities.prototype.parameters = function (type) {
-        var paramAnnotations = this.getParamAnnotations(type);
+        var paramAnnotations = this.getParamAnnotations(type, 'constructor');
         var paramTypes = this._reflect.getMetadata(designParamtypes, type);
         var maxLength = Math.max((paramTypes || paramAnnotations || []).length);
         var result = new Array(maxLength).fill([], 0, maxLength);

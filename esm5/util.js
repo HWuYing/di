@@ -16,26 +16,41 @@ function isExistingProvider(value) {
 function isFactoryProvider(value) {
     return !!(value && value.useFactory);
 }
+function isClassProvider(value) {
+    return !!(value && value.useClass);
+}
 function hasDeps(value) {
     return !!(value && value.deps);
 }
-export function isClassProvider(value) {
-    return !!(value && value.useClass);
+function createProxy(cache, type) {
+    var obj = Object.create(type.prototype);
+    var proxy = new Proxy(obj, {
+        set: function (_target, props, value) { return obj[props] = value; },
+        get: function (_target, props) {
+            return typeof obj[props] === 'function' ? function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                return obj[props].apply(obj, args);
+            } : obj[props];
+        }
+    });
+    return Object.defineProperty(cache, 'proxy', { get: function () { return proxy; }, set: function (value) { return obj = value; } });
 }
-var empty = {};
 function factory(deps, type) {
+    var empty = {};
     var map = new Map();
     return function () {
         var currentInjector = getCurrentInjector();
-        var cache = map.get(currentInjector) || { _m: empty, pending: false };
-        if (cache._m !== empty)
-            return cache._m;
+        var cache = map.get(currentInjector) || { proxy: empty, pending: false };
+        if (cache.proxy !== empty)
+            return cache.proxy;
         if (cache.pending)
-            return cache._m = Object.create(type.prototype);
+            return createProxy(cache, type).proxy;
         map.set(currentInjector, cache);
         cache.pending = true;
-        var cls = new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps), false)))();
-        var m = propArgs(cache._m = cache._m !== empty ? Object.assign(cache._m, cls) : cls, getPropMetadata(type));
+        var m = propArgs(cache.proxy = new (type.bind.apply(type, __spreadArray([void 0], injectArgs(deps), false)))(), getPropMetadata(type));
         map.delete(currentInjector);
         return m;
     };
