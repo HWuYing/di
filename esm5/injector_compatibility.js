@@ -57,7 +57,6 @@ export function injectArgs(types) {
 }
 var propMetaToValue = factoryMetaToValue(function (type, name, value) { return value; }, -1 /* DecoratorFlags.Inject */);
 export function propArgs(type, propMetadata) {
-    type.__ɵɵInject__ = injector;
     Object.keys(propMetadata).forEach(function (prop) {
         type[prop] = propMetaToValue(propMetadata[prop], function (transform, _meta, value) { return transform(type, prop, value); });
     });
