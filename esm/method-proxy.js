@@ -26,12 +26,14 @@ let MethodProxy = class MethodProxy {
         }
         loopMain([...annotations], handler, adopt, () => end(endResult !== skipMethodFlag));
     }
-    _proxyMethod(type, method, agent) {
-        if (!type || !agent || typeof agent !== 'function')
+    _proxyMethod(type, method) {
+        const agent = type[method];
+        const ctor = Object.getPrototypeOf(type).constructor;
+        if (!ctor || !agent || typeof agent !== 'function')
             return (resolve) => resolve(agent);
-        const annotations = reflectCapabilities.getParamAnnotations(type, method);
-        const methodAnnotations = reflectCapabilities.getMethodAnnotations(type, method);
-        return this.createAgent(annotations, methodAnnotations, agent);
+        const annotations = reflectCapabilities.getParamAnnotations(ctor, method);
+        const methodAnnotations = reflectCapabilities.getMethodAnnotations(ctor, method);
+        return this.createAgent(annotations, methodAnnotations, (...args) => agent.apply(type, args));
     }
     injectArgs(annotations, ...args) {
         return injectArgs(annotations, ...args);
@@ -45,13 +47,13 @@ let MethodProxy = class MethodProxy {
             return value;
         };
     }
-    proxyMethod(type, method, agent) {
-        const _agent = this._proxyMethod(type, method, agent);
-        return (...args) => _agent(undefined, ...args);
+    proxyMethod(type, method) {
+        const agent = this._proxyMethod(type, method);
+        return (...args) => agent(undefined, ...args);
     }
-    proxyMethodAsync(type, method, agent) {
-        const _agent = this._proxyMethod(type, method, agent);
-        return (resolve, ...args) => _agent(resolve, ...args);
+    proxyMethodAsync(type, method) {
+        const agent = this._proxyMethod(type, method);
+        return (resolve, ...args) => agent(resolve, ...args);
     }
 };
 MethodProxy.skipMethodFlag = skipMethodFlag;

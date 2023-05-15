@@ -32,12 +32,20 @@ var MethodProxy = /** @class */ (function () {
         }
         loopMain(__spreadArray([], annotations, true), handler, adopt, function () { return end(endResult !== skipMethodFlag); });
     };
-    MethodProxy.prototype._proxyMethod = function (type, method, agent) {
-        if (!type || !agent || typeof agent !== 'function')
+    MethodProxy.prototype._proxyMethod = function (type, method) {
+        var agent = type[method];
+        var ctor = Object.getPrototypeOf(type).constructor;
+        if (!ctor || !agent || typeof agent !== 'function')
             return function (resolve) { return resolve(agent); };
-        var annotations = reflectCapabilities.getParamAnnotations(type, method);
-        var methodAnnotations = reflectCapabilities.getMethodAnnotations(type, method);
-        return this.createAgent(annotations, methodAnnotations, agent);
+        var annotations = reflectCapabilities.getParamAnnotations(ctor, method);
+        var methodAnnotations = reflectCapabilities.getMethodAnnotations(ctor, method);
+        return this.createAgent(annotations, methodAnnotations, function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            return agent.apply(type, args);
+        });
     };
     MethodProxy.prototype.injectArgs = function (annotations) {
         var args = [];
@@ -61,24 +69,24 @@ var MethodProxy = /** @class */ (function () {
             return value;
         };
     };
-    MethodProxy.prototype.proxyMethod = function (type, method, agent) {
-        var _agent = this._proxyMethod(type, method, agent);
+    MethodProxy.prototype.proxyMethod = function (type, method) {
+        var agent = this._proxyMethod(type, method);
         return function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            return _agent.apply(void 0, __spreadArray([undefined], args, false));
+            return agent.apply(void 0, __spreadArray([undefined], args, false));
         };
     };
-    MethodProxy.prototype.proxyMethodAsync = function (type, method, agent) {
-        var _agent = this._proxyMethod(type, method, agent);
+    MethodProxy.prototype.proxyMethodAsync = function (type, method) {
+        var agent = this._proxyMethod(type, method);
         return function (resolve) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 args[_i - 1] = arguments[_i];
             }
-            return _agent.apply(void 0, __spreadArray([resolve], args, false));
+            return agent.apply(void 0, __spreadArray([resolve], args, false));
         };
     };
     MethodProxy.skipMethodFlag = skipMethodFlag;
