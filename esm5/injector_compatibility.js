@@ -55,10 +55,11 @@ export function injectArgs(types) {
     var handler = function (transform, meta, value) { return transform.apply(void 0, __spreadArray([meta, value], args, false)); };
     return types.map(function (arg) { return argsMetaToValue(Array.isArray(arg) ? arg : [arg], handler); });
 }
-var propMetaToValue = factoryMetaToValue(function (type, name, value) { return value; }, -1 /* DecoratorFlags.Inject */);
 export function propArgs(type, propMetadata) {
     Object.keys(propMetadata).forEach(function (prop) {
-        type[prop] = propMetaToValue(propMetadata[prop], function (transform, _meta, value) { return transform(type, prop, value); });
+        var handler = function (transform, meta, value) { return transform(meta, value, type, prop); };
+        var value = argsMetaToValue(propMetadata[prop], handler);
+        value !== type[prop] && (type[prop] = value);
     });
     return type;
 }

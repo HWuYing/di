@@ -50,10 +50,11 @@ export function injectArgs(types, ...args) {
     const handler = (transform, meta, value) => transform(meta, value, ...args);
     return types.map((arg) => argsMetaToValue(Array.isArray(arg) ? arg : [arg], handler));
 }
-const propMetaToValue = factoryMetaToValue((type, name, value) => value, -1 /* DecoratorFlags.Inject */);
 export function propArgs(type, propMetadata) {
     Object.keys(propMetadata).forEach((prop) => {
-        type[prop] = propMetaToValue(propMetadata[prop], (transform, _meta, value) => transform(type, prop, value));
+        const handler = (transform, meta, value) => transform(meta, value, type, prop);
+        const value = argsMetaToValue(propMetadata[prop], handler);
+        value !== type[prop] && (type[prop] = value);
     });
     return type;
 }

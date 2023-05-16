@@ -3,7 +3,7 @@ export { getInjectableDef, INJECTOR_PROV_DEF } from './def';
 export { Inject, Injectable, ROOT_SCOPE, setInjectableDef } from './injectable';
 export { InjectFlags } from './injector';
 export { Injector } from './injector.abstract';
-export { forwardRef } from './injector_compatibility';
+export { forwardRef, propArgs } from './injector_compatibility';
 export { INJECTOR_SCOPE, InjectorToken } from './injector-token';
 export { MethodProxy } from './method-proxy';
 export { reflectCapabilities } from './reflection-capabilities';
