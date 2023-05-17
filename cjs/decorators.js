@@ -58,11 +58,11 @@ function makeParamDecorator(name, props, typeFn) {
         }
         var annotationInstance = new ((_a = ParamDecoratorFactory).bind.apply(_a, tslib_1.__spreadArray([void 0], args, false)))();
         return function ParamOrPropDecorator(cls, method, index) {
-            var isProp = typeof index === 'undefined';
-            var ctor = isProp || method ? cls.constructor : cls;
-            var meta = getPropertyValue(ctor, isProp ? exports.PROP_METADATA : exports.PARAMETERS);
-            meta.unshift(isProp ? { prop: method, annotationInstance: annotationInstance } : { method: method || 'constructor', index: index, annotationInstance: annotationInstance });
-            typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([ctor, method], args.concat(isProp ? [] : index), false));
+            var isParam = typeof index === 'number';
+            var ctor = method ? cls.constructor : cls;
+            var meta = getPropertyValue(ctor, isParam ? exports.PARAMETERS : exports.PROP_METADATA);
+            meta.unshift(isParam ? { method: method || 'constructor', index: index, annotationInstance: annotationInstance } : { prop: method, annotationInstance: annotationInstance });
+            typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([ctor, method, index], args, false));
         };
     }
     ParamDecoratorFactory.prototype.metadataName = name;
