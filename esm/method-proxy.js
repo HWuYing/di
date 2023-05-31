@@ -20,10 +20,7 @@ let MethodProxy = class MethodProxy {
     methodIntercept(annotations, end, ...args) {
         let endResult = true;
         const adopt = (value) => value === skipMethodFlag ? endResult = value : value;
-        function handler(annotation) {
-            const { annotationInstance } = annotation;
-            return annotationInstance === null || annotationInstance === void 0 ? void 0 : annotationInstance.hook(annotationInstance, ...args);
-        }
+        const handler = ({ annotationInstance }) => annotationInstance === null || annotationInstance === void 0 ? void 0 : annotationInstance.hook(annotationInstance, ...args);
         loopMain([...annotations], handler, adopt, () => end(endResult !== skipMethodFlag));
     }
     _proxyMethod(type, method) {
@@ -52,8 +49,7 @@ let MethodProxy = class MethodProxy {
         return (...args) => agent(undefined, ...args);
     }
     proxyMethodAsync(type, method) {
-        const agent = this._proxyMethod(type, method);
-        return (resolve, ...args) => agent(resolve, ...args);
+        return this._proxyMethod(type, method);
     }
 };
 MethodProxy.skipMethodFlag = skipMethodFlag;

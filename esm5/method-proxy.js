@@ -26,10 +26,10 @@ var MethodProxy = /** @class */ (function () {
         }
         var endResult = true;
         var adopt = function (value) { return value === skipMethodFlag ? endResult = value : value; };
-        function handler(annotation) {
-            var annotationInstance = annotation.annotationInstance;
+        var handler = function (_a) {
+            var annotationInstance = _a.annotationInstance;
             return annotationInstance === null || annotationInstance === void 0 ? void 0 : annotationInstance.hook.apply(annotationInstance, __spreadArray([annotationInstance], args, false));
-        }
+        };
         loopMain(__spreadArray([], annotations, true), handler, adopt, function () { return end(endResult !== skipMethodFlag); });
     };
     MethodProxy.prototype._proxyMethod = function (type, method) {
@@ -80,14 +80,7 @@ var MethodProxy = /** @class */ (function () {
         };
     };
     MethodProxy.prototype.proxyMethodAsync = function (type, method) {
-        var agent = this._proxyMethod(type, method);
-        return function (resolve) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            return agent.apply(void 0, __spreadArray([resolve], args, false));
-        };
+        return this._proxyMethod(type, method);
     };
     MethodProxy.skipMethodFlag = skipMethodFlag;
     MethodProxy = __decorate([

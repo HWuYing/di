@@ -5,5 +5,5 @@ export declare class MethodProxy {
     injectArgs(annotations: any[], ...args: any[]): any[];
     createAgent(annotations: any[], methodAnnotations: any[], agent: (...args: any[]) => any): (resolve?: (value: any) => any, ...args: any[]) => undefined;
     proxyMethod<T>(type: T, method: string): (...args: any[]) => any;
-    proxyMethodAsync<T>(type: T, method: string): (resolve: <T_1>(value: T_1) => T_1, ...args: any[]) => any;
+    proxyMethodAsync<T>(type: T, method: string): ((resolve: any) => any) | ((resolve?: (value: any) => any, ...args: any[]) => undefined);
 }
