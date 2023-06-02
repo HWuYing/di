@@ -13,7 +13,9 @@
 			"default": "./esm5/index.js"
 		}
 	},
-	"dependencies": {},
+	"dependencies": {
+		"reflect-metadata": "^0.1.13"
+	},
 	"scripts": {
 		"test": "echo 'Error: no test specified' && exit 1"
 	},
