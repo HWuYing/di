@@ -98,7 +98,7 @@ var StaticInjector = /** @class */ (function () {
             value = record.factory();
         if (!isNoneCache) {
             record.value = value;
-            if (typeof value === 'object' && value.destroy && !(value instanceof StaticInjector)) {
+            if ((value === null || value === void 0 ? void 0 : value.destroy) && !(value instanceof StaticInjector)) {
                 this.onDestroy.add(value);
             }
         }

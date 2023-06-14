@@ -20,7 +20,7 @@ let MethodProxy = class MethodProxy {
     methodIntercept(annotations, end, ...args) {
         let endResult = true;
         const adopt = (value) => value === skipMethodFlag ? endResult = value : value;
-        const handler = ({ annotationInstance }) => annotationInstance === null || annotationInstance === void 0 ? void 0 : annotationInstance.hook(annotationInstance, ...args);
+        const handler = ({ annotationInstance }) => annotationInstance.hook && annotationInstance.hook(annotationInstance, ...args);
         loopMain([...annotations], handler, adopt, () => end(endResult !== skipMethodFlag));
     }
     _proxyMethod(type, method) {

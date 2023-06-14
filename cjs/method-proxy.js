@@ -31,7 +31,7 @@ var MethodProxy = /** @class */ (function () {
         var adopt = function (value) { return value === skipMethodFlag ? endResult = value : value; };
         var handler = function (_a) {
             var annotationInstance = _a.annotationInstance;
-            return annotationInstance === null || annotationInstance === void 0 ? void 0 : annotationInstance.hook.apply(annotationInstance, tslib_1.__spreadArray([annotationInstance], args, false));
+            return annotationInstance.hook && annotationInstance.hook.apply(annotationInstance, tslib_1.__spreadArray([annotationInstance], args, false));
         };
         loopMain(tslib_1.__spreadArray([], annotations, true), handler, adopt, function () { return end(endResult !== skipMethodFlag); });
     };
