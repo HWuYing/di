@@ -2,9 +2,6 @@ import { __spreadArray } from "tslib";
 var FORWARD_REF = '__forward__ref__';
 var DI_DECORATOR_FLAG = '__DI_FLAG__';
 var injector = null;
-export function ɵɵInject(token, flags) {
-    return injector === null || injector === void 0 ? void 0 : injector.get(token, flags);
-}
 export function saveCurrentInjector(_inject) {
     var preInjector = injector;
     injector = _inject;
@@ -22,8 +19,10 @@ export function getInjectFlag(token) {
     return token[DI_DECORATOR_FLAG];
 }
 export function forwardRef(ref) {
-    ref[DI_DECORATOR_FLAG] = FORWARD_REF;
-    return ref;
+    return attachInjectFlag(ref, FORWARD_REF);
+}
+export function ɵɵInject(token, flags) {
+    return injector === null || injector === void 0 ? void 0 : injector.get(typeof token === 'function' && getInjectFlag(token) === FORWARD_REF ? token() : token, flags);
 }
 function factoryMetaToValue(_transform, tokeFlags) {
     return function (metaList, handler) {
@@ -36,7 +35,6 @@ function factoryMetaToValue(_transform, tokeFlags) {
             if (typeof flag !== 'number')
                 return token = meta;
             flag === tokeFlags ? token = meta.token : flags = flags | flag;
-            token = typeof token === 'function' && getInjectFlag(token) === FORWARD_REF ? token() : token;
         });
         var value = ɵɵInject(token, flags);
         while (metaCache.length) {
