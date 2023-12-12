@@ -17,7 +17,9 @@ function getCurrentInjector() {
 exports.getCurrentInjector = getCurrentInjector;
 function attachInjectFlag(decorator, flag) {
     decorator[DI_DECORATOR_FLAG] = flag;
-    decorator.prototype[DI_DECORATOR_FLAG] = flag;
+    if (decorator.prototype) {
+        decorator.prototype[DI_DECORATOR_FLAG] = flag;
+    }
     return decorator;
 }
 exports.attachInjectFlag = attachInjectFlag;
