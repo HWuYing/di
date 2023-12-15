@@ -10,7 +10,7 @@ var InjectFlags;
     InjectFlags[InjectFlags["Default"] = 0] = "Default";
     InjectFlags[InjectFlags["Self"] = 2] = "Self";
     InjectFlags[InjectFlags["NonCache"] = 16] = "NonCache";
-})(InjectFlags = exports.InjectFlags || (exports.InjectFlags = {}));
+})(InjectFlags || (exports.InjectFlags = InjectFlags = {}));
 var NOT_YES = {};
 function makeRecord(factory, value, multi) {
     if (value === void 0) { value = NOT_YES; }
