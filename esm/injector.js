@@ -19,6 +19,9 @@ function checkInjectableScope(scope, def) {
 function deepForEach(input, fn) {
     input.forEach(value => Array.isArray(value) ? deepForEach(value, fn) : fn(value));
 }
+export function deepProviders(injector, providers) {
+    deepForEach(providers || [], (provider) => injector.set(typeof provider === 'function' ? provider : provider.provide, provider));
+}
 export class StaticInjector {
     get destroyed() {
         return this._destroyed;
@@ -28,7 +31,7 @@ export class StaticInjector {
         this._destroyed = false;
         this.onDestroy = new Set();
         this.records = new Map();
-        deepForEach(additionalProviders || [], (provider) => this.set(typeof provider === 'function' ? provider : provider.provide, provider));
+        deepProviders(this, additionalProviders);
         this.records.set(INJECTOR, makeRecord(() => this));
         this.scope = this.get(INJECTOR_SCOPE, InjectFlags.Self);
     }

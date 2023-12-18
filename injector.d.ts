@@ -5,6 +5,7 @@ export declare enum InjectFlags {
     Self = 2,
     NonCache = 16
 }
+export declare function deepProviders(injector: Injector, providers?: Provider[] | null): void;
 export declare class StaticInjector {
     protected parent?: Injector;
     private scope;

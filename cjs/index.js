@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertToFactory = exports.reflectCapabilities = exports.MethodProxy = exports.InjectorToken = exports.INJECTOR_SCOPE = exports.propArgs = exports.forwardRef = exports.Injector = exports.InjectFlags = exports.setInjectableDef = exports.ROOT_SCOPE = exports.Injectable = exports.Inject = exports.INJECTOR_PROV_DEF = exports.getInjectableDef = exports.makePropDecorator = exports.makeParamDecorator = exports.makeMethodDecorator = exports.makeDecorator = void 0;
+exports.convertToFactory = exports.reflectCapabilities = exports.MethodProxy = exports.InjectorToken = exports.INJECTOR_SCOPE = exports.propArgs = exports.forwardRef = exports.Injector = exports.InjectFlags = exports.deepProviders = exports.setInjectableDef = exports.ROOT_SCOPE = exports.Injectable = exports.Inject = exports.INJECTOR_PROV_DEF = exports.getInjectableDef = exports.makePropDecorator = exports.makeParamDecorator = exports.makeMethodDecorator = exports.makeDecorator = void 0;
 var decorators_1 = require("./decorators");
 Object.defineProperty(exports, "makeDecorator", { enumerable: true, get: function () { return decorators_1.makeDecorator; } });
 Object.defineProperty(exports, "makeMethodDecorator", { enumerable: true, get: function () { return decorators_1.makeMethodDecorator; } });
@@ -15,6 +15,7 @@ Object.defineProperty(exports, "Injectable", { enumerable: true, get: function (
 Object.defineProperty(exports, "ROOT_SCOPE", { enumerable: true, get: function () { return injectable_1.ROOT_SCOPE; } });
 Object.defineProperty(exports, "setInjectableDef", { enumerable: true, get: function () { return injectable_1.setInjectableDef; } });
 var injector_1 = require("./injector");
+Object.defineProperty(exports, "deepProviders", { enumerable: true, get: function () { return injector_1.deepProviders; } });
 Object.defineProperty(exports, "InjectFlags", { enumerable: true, get: function () { return injector_1.InjectFlags; } });
 var injector_abstract_1 = require("./injector.abstract");
 Object.defineProperty(exports, "Injector", { enumerable: true, get: function () { return injector_abstract_1.Injector; } });

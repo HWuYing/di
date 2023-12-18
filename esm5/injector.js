@@ -21,6 +21,9 @@ function checkInjectableScope(scope, def) {
 function deepForEach(input, fn) {
     input.forEach(function (value) { return Array.isArray(value) ? deepForEach(value, fn) : fn(value); });
 }
+export function deepProviders(injector, providers) {
+    deepForEach(providers || [], function (provider) { return injector.set(typeof provider === 'function' ? provider : provider.provide, provider); });
+}
 var StaticInjector = /** @class */ (function () {
     function StaticInjector(additionalProviders, parent) {
         var _this = this;
@@ -28,7 +31,7 @@ var StaticInjector = /** @class */ (function () {
         this._destroyed = false;
         this.onDestroy = new Set();
         this.records = new Map();
-        deepForEach(additionalProviders || [], function (provider) { return _this.set(typeof provider === 'function' ? provider : provider.provide, provider); });
+        deepProviders(this, additionalProviders);
         this.records.set(INJECTOR, makeRecord(function () { return _this; }));
         this.scope = this.get(INJECTOR_SCOPE, InjectFlags.Self);
     }

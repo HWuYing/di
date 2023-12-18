@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createInjector = exports.StaticInjector = exports.InjectFlags = void 0;
+exports.createInjector = exports.StaticInjector = exports.deepProviders = exports.InjectFlags = void 0;
 var def_1 = require("./def");
 var injector_compatibility_1 = require("./injector_compatibility");
 var injector_token_1 = require("./injector-token");
@@ -24,6 +24,10 @@ function checkInjectableScope(scope, def) {
 function deepForEach(input, fn) {
     input.forEach(function (value) { return Array.isArray(value) ? deepForEach(value, fn) : fn(value); });
 }
+function deepProviders(injector, providers) {
+    deepForEach(providers || [], function (provider) { return injector.set(typeof provider === 'function' ? provider : provider.provide, provider); });
+}
+exports.deepProviders = deepProviders;
 var StaticInjector = /** @class */ (function () {
     function StaticInjector(additionalProviders, parent) {
         var _this = this;
@@ -31,7 +35,7 @@ var StaticInjector = /** @class */ (function () {
         this._destroyed = false;
         this.onDestroy = new Set();
         this.records = new Map();
-        deepForEach(additionalProviders || [], function (provider) { return _this.set(typeof provider === 'function' ? provider : provider.provide, provider); });
+        deepProviders(this, additionalProviders);
         this.records.set(injector_token_1.INJECTOR, makeRecord(function () { return _this; }));
         this.scope = this.get(injector_token_1.INJECTOR_SCOPE, InjectFlags.Self);
     }
