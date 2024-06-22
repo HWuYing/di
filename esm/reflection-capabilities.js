@@ -3,6 +3,7 @@
 /* eslint-disable no-prototype-builtins */
 import 'reflect-metadata';
 import { ANNOTATIONS, METHODS, PARAMETERS, PROP_METADATA } from './decorators';
+const designPropType = `design:type`;
 const designParamtypes = `design:paramtypes`;
 function getParentCtor(ctor) {
     const parentProto = ctor.prototype ? Object.getPrototypeOf(ctor.prototype) : null;
@@ -12,6 +13,9 @@ function getParentCtor(ctor) {
 class ReflectionCapabilities {
     constructor() {
         this._reflect = typeof global === 'object' ? global.Reflect : typeof self === 'object' ? self.Reflect : Reflect;
+    }
+    getPropMetadataValue(target, propertyKey) {
+        return this._reflect.getMetadata(designPropType, target.prototype, propertyKey);
     }
     getAnnotation(type, metadataName) {
         const metadata = type.hasOwnProperty(ANNOTATIONS) && type[ANNOTATIONS] || [];
