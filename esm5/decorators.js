@@ -54,10 +54,12 @@ export function makeParamDecorator(name, props, typeFn) {
         }
         var annotationInstance = new ((_a = ParamDecoratorFactory).bind.apply(_a, __spreadArray([void 0], args, false)))();
         return function ParamOrPropDecorator(cls, method, index) {
+            var prop = method;
+            var descriptor = index;
             var isParam = typeof index === 'number';
             var ctor = method ? cls.constructor : cls;
             var meta = getPropertyValue(ctor, isParam ? PARAMETERS : PROP_METADATA);
-            meta.unshift(isParam ? { method: method || 'constructor', index: index, annotationInstance: annotationInstance } : { prop: method, annotationInstance: annotationInstance });
+            meta.unshift(isParam ? { method: method || 'constructor', index: index, annotationInstance: annotationInstance } : { prop: prop, descriptor: descriptor, annotationInstance: annotationInstance });
             typeFn && typeFn.apply(void 0, __spreadArray([ctor, method, index], args, false));
         };
     }

@@ -38,10 +38,12 @@ export function makeParamDecorator(name, props, typeFn) {
         }
         const annotationInstance = new ParamDecoratorFactory(...args);
         return function ParamOrPropDecorator(cls, method, index) {
+            const prop = method;
+            const descriptor = index;
             const isParam = typeof index === 'number';
             const ctor = method ? cls.constructor : cls;
             const meta = getPropertyValue(ctor, isParam ? PARAMETERS : PROP_METADATA);
-            meta.unshift(isParam ? { method: method || 'constructor', index, annotationInstance } : { prop: method, annotationInstance });
+            meta.unshift(isParam ? { method: method || 'constructor', index, annotationInstance } : { prop, descriptor, annotationInstance });
             typeFn && typeFn(ctor, method, index, ...args);
         };
     }

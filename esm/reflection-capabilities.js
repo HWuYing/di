@@ -3,8 +3,8 @@
 /* eslint-disable no-prototype-builtins */
 import 'reflect-metadata';
 import { ANNOTATIONS, METHODS, PARAMETERS, PROP_METADATA } from './decorators';
-const designPropType = `design:type`;
-const designParamtypes = `design:paramtypes`;
+const designPropType = 'design:type';
+const designParamtypes = 'design:paramtypes';
 function getParentCtor(ctor) {
     const parentProto = ctor.prototype ? Object.getPrototypeOf(ctor.prototype) : null;
     const parentCtor = parentProto ? parentProto.constructor : null;
