@@ -6,7 +6,7 @@ export declare const PROP_METADATA = "__prop__metadata__";
 type ClassType = {
     new (...args: any[]): any;
 } & Type;
-type ClassDecorator = <TFunction extends ClassType>(target: TFunction) => TFunction;
+export type ClassDecorator = <TFunction extends ClassType>(target: TFunction) => TFunction;
 export declare function makeDecorator<M extends any[]>(name: string, props?: (...args: M) => any, typeFn?: (type: Type<any>, ...args: any[]) => void): (...args: M) => ClassDecorator;
 export declare function makeParamDecorator<M extends any[], N = ParameterDecorator>(name: string, props?: (...args: M) => any, typeFn?: <T>(type: Type<T>, ...args: any[]) => void): (...args: M) => N;
 export declare function makeMethodDecorator<M extends any[]>(name: string, props?: (...args: M) => any, typeFn?: <T>(type: Type<T>, ...args: any[]) => void): (...args: M) => MethodDecorator;

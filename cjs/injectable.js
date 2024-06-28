@@ -15,7 +15,7 @@ var setInjectableDef = function (type, provider) {
     return (0, def_1.setInjectableDef)(type, injectableDef);
 };
 exports.setInjectableDef = setInjectableDef;
-exports.Injectable = (0, decorators_1.makeDecorator)('Injectable', undefined, exports.setInjectableDef);
+exports.Injectable = (0, decorators_1.makeDecorator)('Injectable', function (provider) { return provider; }, exports.setInjectableDef);
 var mergeInfo = function (token, options) {
     if (options === void 0) { options = {}; }
     return (tslib_1.__assign(tslib_1.__assign({}, options), { token: token }));
