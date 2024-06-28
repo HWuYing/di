@@ -3,7 +3,12 @@ export declare const ANNOTATIONS = "__annotations__";
 export declare const PARAMETERS = "__parameters__";
 export declare const METHODS = "__methods__";
 export declare const PROP_METADATA = "__prop__metadata__";
-export declare function makeDecorator<T>(name: string, props?: (...args: any[]) => any, typeFn?: (type: Type<T>, ...args: any[]) => any): (this: unknown, ...args: any[]) => (cls: Type<T>) => any;
-export declare function makeParamDecorator<T>(name: string, props?: (...args: any[]) => any, typeFn?: (type: Type<T>, ...args: any[]) => any): (this: unknown, ...args: any[]) => any;
-export declare function makeMethodDecorator<T>(name: string, props?: (...args: any[]) => any, typeFn?: (type: Type<T>, ...args: any[]) => any): (this: unknown, ...args: any[]) => any;
-export declare const makePropDecorator: typeof makeParamDecorator;
+type ClassType = {
+    new (...args: any[]): any;
+} & Type;
+type ClassDecorator = <TFunction extends ClassType>(target: TFunction) => TFunction;
+export declare function makeDecorator<M extends any[]>(name: string, props?: (...args: M) => any, typeFn?: (type: Type<any>, ...args: any[]) => void): (...args: M) => ClassDecorator;
+export declare function makeParamDecorator<M extends any[], N = ParameterDecorator>(name: string, props?: (...args: M) => any, typeFn?: <T>(type: Type<T>, ...args: any[]) => void): (...args: M) => N;
+export declare function makeMethodDecorator<M extends any[]>(name: string, props?: (...args: M) => any, typeFn?: <T>(type: Type<T>, ...args: any[]) => void): (...args: M) => MethodDecorator;
+export declare const makePropDecorator: <M extends any[], N = PropertyDecorator>(name: string, props?: (...args: M) => any, typeFn?: <T>(type: Type<T>, ...args: any[]) => void) => (...args: M) => N;
+export {};
