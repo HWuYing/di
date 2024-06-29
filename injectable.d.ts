@@ -1,9 +1,9 @@
-import { Provider, Type } from './type-api';
+import { Provider, TokenKey, Type } from './type-api';
 export declare const ROOT_SCOPE = "root";
-export declare const setInjectableDef: (type: Type<any>, provider?: Provider & {
+type IProvider = Provider & {
     providedIn?: string;
-}) => any;
-export declare const Injectable: (provider?: Provider & {
-    providedIn?: string;
-}) => import("./decorators").ClassDecorator;
-export declare const Inject: any;
+};
+export declare const setInjectableDef: (type: Type, provider?: IProvider) => any;
+export declare const Injectable: (provider?: IProvider) => ClassDecorator;
+export declare const Inject: (token: TokenKey, options?: {}) => ParameterDecorator & PropertyDecorator;
+export {};

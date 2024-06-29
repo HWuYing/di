@@ -1,10 +1,9 @@
 import { InjectorToken } from './injector-token';
-declare interface TypeClass {
-    [x: string]: any;
-}
 export declare interface Type<T = any> extends Function {
-    [x: string]: any;
     new (...args: any[]): T;
+}
+export declare interface TypeClass<T = any> extends Type<T> {
+    [x: string]: any;
 }
 export declare type TokenKey = TypeClass | InjectorToken | Function;
 export interface OnDestroy {
@@ -27,5 +26,4 @@ export interface ValueProvider extends AbstractProvider {
 export interface FactoryProvider extends AbstractProvider {
     useFactory: (...args: any[]) => any;
 }
-export declare type Provider = ValueProvider | ExistingProvider | ClassProvider | FactoryProvider | Type<any> | Provider[];
-export {};
+export declare type Provider = ValueProvider | ExistingProvider | ClassProvider | FactoryProvider | Type | Provider[];
