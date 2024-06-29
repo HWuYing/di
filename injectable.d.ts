@@ -1,6 +1,6 @@
 import { Provider, TokenKey, Type } from './type-api';
 export declare const ROOT_SCOPE = "root";
-type IProvider = Provider & {
+type IProvider = Provider | {
     providedIn?: string;
 };
 export declare const setInjectableDef: (type: Type, provider?: IProvider) => any;
