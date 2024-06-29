@@ -7,5 +7,5 @@ export { forwardRef, propArgs } from './injector_compatibility';
 export { INJECTOR_SCOPE, InjectorToken } from './injector-token';
 export { MethodProxy } from './method-proxy';
 export { reflectCapabilities } from './reflection-capabilities';
-export type { Provider, TokenKey, Type, TypeClass, TargetDecorator } from './type-api';
+export type { Provider, TargetDecorator, TokenKey, Type, TypeClass } from './type-api';
 export { convertToFactory } from './util';
