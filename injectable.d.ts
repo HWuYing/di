@@ -5,5 +5,5 @@ type IProvider = Provider | {
 };
 export declare const setInjectableDef: (type: Type, provider?: IProvider) => any;
 export declare const Injectable: (provider?: IProvider) => ClassDecorator;
-export declare const Inject: (token: TokenKey, options?: {}) => ParameterDecorator & PropertyDecorator;
+export declare const Inject: (token: TokenKey, options?: {}) => import("./type-api").TargetDecorator;
 export {};
