@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertToFactory = void 0;
+exports.convertToFactory = convertToFactory;
 var tslib_1 = require("tslib");
 var injector_compatibility_1 = require("./injector_compatibility");
 var reflection_capabilities_1 = require("./reflection-capabilities");
@@ -82,4 +82,3 @@ function convertToFactory(type, provider) {
     var deps = hasDeps(provider) ? provider.deps : getDeps(_type);
     return factory(deps, _type);
 }
-exports.convertToFactory = convertToFactory;

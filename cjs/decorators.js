@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makePropDecorator = exports.makeMethodDecorator = exports.makeParamDecorator = exports.makeDecorator = exports.PROP_METADATA = exports.METHODS = exports.PARAMETERS = exports.ANNOTATIONS = void 0;
+exports.makePropDecorator = exports.PROP_METADATA = exports.METHODS = exports.PARAMETERS = exports.ANNOTATIONS = void 0;
+exports.makeDecorator = makeDecorator;
+exports.makeParamDecorator = makeParamDecorator;
+exports.makeMethodDecorator = makeMethodDecorator;
 var tslib_1 = require("tslib");
 exports.ANNOTATIONS = '__annotations__';
 exports.PARAMETERS = '__parameters__';
@@ -44,7 +47,6 @@ function makeDecorator(name, props, typeFn) {
     DecoratorFactory.prototype.metadataName = name;
     return DecoratorFactory;
 }
-exports.makeDecorator = makeDecorator;
 function makeParamDecorator(name, props, typeFn) {
     var metaCtor = makeMetadataCtor(props);
     function ParamDecoratorFactory() {
@@ -70,7 +72,6 @@ function makeParamDecorator(name, props, typeFn) {
     ParamDecoratorFactory.prototype.metadataName = name;
     return ParamDecoratorFactory;
 }
-exports.makeParamDecorator = makeParamDecorator;
 function makeMethodDecorator(name, props, typeFn) {
     var metaCtor = makeMetadataCtor(props);
     function MethodDecoratorFactory() {
@@ -93,5 +94,4 @@ function makeMethodDecorator(name, props, typeFn) {
     MethodDecoratorFactory.prototype.metadataName = name;
     return MethodDecoratorFactory;
 }
-exports.makeMethodDecorator = makeMethodDecorator;
 exports.makePropDecorator = makeParamDecorator;

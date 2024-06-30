@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.propArgs = exports.injectArgs = exports.ɵɵInject = exports.forwardRef = exports.getInjectFlag = exports.attachInjectFlag = exports.getCurrentInjector = exports.saveCurrentInjector = void 0;
+exports.saveCurrentInjector = saveCurrentInjector;
+exports.getCurrentInjector = getCurrentInjector;
+exports.attachInjectFlag = attachInjectFlag;
+exports.getInjectFlag = getInjectFlag;
+exports.forwardRef = forwardRef;
+exports.ɵɵInject = ɵɵInject;
+exports.injectArgs = injectArgs;
+exports.propArgs = propArgs;
 var tslib_1 = require("tslib");
 var FORWARD_REF = '__forward__ref__';
 var DI_DECORATOR_FLAG = '__DI_FLAG__';
@@ -10,11 +17,9 @@ function saveCurrentInjector(_inject) {
     injector = _inject;
     return preInjector;
 }
-exports.saveCurrentInjector = saveCurrentInjector;
 function getCurrentInjector() {
     return injector;
 }
-exports.getCurrentInjector = getCurrentInjector;
 function attachInjectFlag(decorator, flag) {
     decorator[DI_DECORATOR_FLAG] = flag;
     if (decorator.prototype) {
@@ -22,19 +27,15 @@ function attachInjectFlag(decorator, flag) {
     }
     return decorator;
 }
-exports.attachInjectFlag = attachInjectFlag;
 function getInjectFlag(token) {
     return token[DI_DECORATOR_FLAG];
 }
-exports.getInjectFlag = getInjectFlag;
 function forwardRef(ref) {
     return attachInjectFlag(ref, FORWARD_REF);
 }
-exports.forwardRef = forwardRef;
 function ɵɵInject(token, flags) {
     return injector === null || injector === void 0 ? void 0 : injector.get(typeof token === 'function' && getInjectFlag(token) === FORWARD_REF ? token() : token, flags);
 }
-exports.ɵɵInject = ɵɵInject;
 function factoryMetaToValue(_transform, tokeFlags) {
     return function (metaList, handler) {
         var flags = 0;
@@ -64,7 +65,6 @@ function injectArgs(types) {
     var handler = function (transform, meta, value) { return transform.apply(void 0, tslib_1.__spreadArray([meta, value], args, false)); };
     return types.map(function (arg) { return argsMetaToValue(Array.isArray(arg) ? arg : [arg], handler); });
 }
-exports.injectArgs = injectArgs;
 function propArgs(type, propMetadata) {
     Object.keys(propMetadata).forEach(function (prop) {
         var handler = function (transform, meta, value) { return transform(meta, value, type, prop); };
@@ -73,4 +73,3 @@ function propArgs(type, propMetadata) {
     });
     return type;
 }
-exports.propArgs = propArgs;

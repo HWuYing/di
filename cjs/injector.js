@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createInjector = exports.StaticInjector = exports.deepProviders = exports.InjectFlags = void 0;
+exports.StaticInjector = exports.InjectFlags = void 0;
+exports.deepProviders = deepProviders;
+exports.createInjector = createInjector;
 var def_1 = require("./def");
 var injector_compatibility_1 = require("./injector_compatibility");
 var injector_token_1 = require("./injector-token");
@@ -27,7 +29,6 @@ function deepForEach(input, fn) {
 function deepProviders(injector, providers) {
     deepForEach(providers || [], function (provider) { return injector.set(typeof provider === 'function' ? provider : provider.provide, provider); });
 }
-exports.deepProviders = deepProviders;
 var StaticInjector = /** @class */ (function () {
     function StaticInjector(additionalProviders, parent) {
         var _this = this;
@@ -114,4 +115,3 @@ exports.StaticInjector = StaticInjector;
 function createInjector(providers, parent) {
     return new StaticInjector(providers, parent);
 }
-exports.createInjector = createInjector;
