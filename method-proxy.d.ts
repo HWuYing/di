@@ -1,9 +1,7 @@
+import { StaticInjector } from './injector';
 export declare class MethodProxy {
-    static skipMethodFlag: {};
-    protected methodIntercept(annotations: any[], end: any, ...args: any[]): any;
-    protected _proxyMethod(type: any, method: string): ((resolve: any) => any) | ((resolve?: (value: any) => any, ...args: any[]) => undefined);
+    injector: StaticInjector;
+    protected createAgent<T>(type: T, name: string, nativeMethod: (...args: any[]) => any): (...args: any[]) => any;
     injectArgs(annotations: any[], ...args: any[]): any[];
-    createAgent(annotations: any[], methodAnnotations: any[], agent: (...args: any[]) => any): (resolve?: (value: any) => any, ...args: any[]) => undefined;
-    proxyMethod<T>(type: T, method: string): (...args: any[]) => any;
-    proxyMethodAsync<T>(type: T, method: string): ((resolve: any) => any) | ((resolve?: (value: any) => any, ...args: any[]) => undefined);
+    proxyMethod<T>(type: T, method: string): any;
 }

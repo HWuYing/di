@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makePropDecorator = exports.PROP_METADATA = exports.METHODS = exports.PARAMETERS = exports.ANNOTATIONS = void 0;
+exports.makePropDecorator = exports.PROP_METADATA = exports.NATIVE_METHOD = exports.METHODS = exports.PARAMETERS = exports.ANNOTATIONS = void 0;
 exports.makeDecorator = makeDecorator;
 exports.makeParamDecorator = makeParamDecorator;
 exports.makeMethodDecorator = makeMethodDecorator;
@@ -8,6 +8,7 @@ var tslib_1 = require("tslib");
 exports.ANNOTATIONS = '__annotations__';
 exports.PARAMETERS = '__parameters__';
 exports.METHODS = '__methods__';
+exports.NATIVE_METHOD = '__native__method__';
 exports.PROP_METADATA = '__prop__metadata__';
 function hasOwnProperty(object, v) {
     return Object.prototype.hasOwnProperty.call(object, v);
@@ -87,6 +88,17 @@ function makeMethodDecorator(name, props, typeFn) {
         return function MethodDecorator(_a, method, descriptor) {
             var ctor = _a.constructor;
             var methods = getPropertyValue(ctor, exports.METHODS);
+            var native = getPropertyValue(ctor, exports.NATIVE_METHOD, {});
+            if (!native[method]) {
+                native[method] = descriptor.value;
+                descriptor.value = function () {
+                    var args = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        args[_i] = arguments[_i];
+                    }
+                    return native[method].apply(this, args);
+                };
+            }
             methods.push({ method: method, descriptor: descriptor, annotationInstance: annotationInstance });
             typeFn && typeFn.apply(void 0, tslib_1.__spreadArray([ctor, method, descriptor], args, false));
         };

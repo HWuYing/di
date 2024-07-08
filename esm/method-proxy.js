@@ -1,58 +1,49 @@
-import { __decorate } from "tslib";
-import { Injectable } from './injectable';
-import { injectArgs } from './injector_compatibility';
+import { __decorate, __metadata } from "tslib";
+import { NATIVE_METHOD } from './decorators';
+import { Inject, Injectable } from './injectable';
+import { StaticInjector } from './injector';
+import { Injector } from './injector.abstract';
+import { injectArgs, saveCurrentInjector } from './injector_compatibility';
 import { reflectCapabilities } from './reflection-capabilities';
-const skipMethodFlag = {};
-function loopMain(loopList, handler, adopt, end) {
-    function step(result) {
-        // eslint-disable-next-line no-use-before-define
-        return adopt(result) !== skipMethodFlag && loopList.length ? excel() : end();
-    }
-    function excel() {
-        if (!loopList.length)
-            return end();
-        const result = handler(loopList.shift());
-        (result === null || result === void 0 ? void 0 : result.then) ? result.then(step) : (result === null || result === void 0 ? void 0 : result.subscribe) ? result.subscribe(step) : step(result);
-    }
-    excel();
-}
 let MethodProxy = class MethodProxy {
-    methodIntercept(annotations, end, ...args) {
-        let endResult = true;
-        const adopt = (value) => value === skipMethodFlag ? endResult = value : value;
-        const handler = ({ annotationInstance }) => annotationInstance.hook && annotationInstance.hook(annotationInstance, ...args);
-        loopMain([...annotations], handler, adopt, () => end(endResult !== skipMethodFlag));
+    createAgent(type, name, nativeMethod) {
+        if (nativeMethod.__isProxy__)
+            return nativeMethod;
+        const proxy = {
+            [name]: (...args) => {
+                const annotations = reflectCapabilities.getParamAnnotations(Object.getPrototypeOf(type).constructor, name);
+                return nativeMethod.apply(type, !annotations.length ? args : this.injectArgs(annotations, ...args));
+            }
+        };
+        Object.defineProperty(proxy[name], '__isProxy__', { value: true });
+        return proxy[name];
     }
-    _proxyMethod(type, method) {
+    injectArgs(annotations, ...args) {
+        const reInjector = saveCurrentInjector(this.injector);
+        try {
+            return injectArgs(annotations, ...args);
+        }
+        finally {
+            saveCurrentInjector(reInjector);
+        }
+    }
+    proxyMethod(type, method) {
+        var _a;
         const agent = type[method];
         const ctor = Object.getPrototypeOf(type).constructor;
         if (!ctor || !agent || typeof agent !== 'function')
-            return (resolve) => resolve(agent);
-        const annotations = reflectCapabilities.getParamAnnotations(ctor, method);
-        const methodAnnotations = reflectCapabilities.getMethodAnnotations(ctor, method);
-        return this.createAgent(annotations, methodAnnotations, (...args) => agent.apply(type, args));
-    }
-    injectArgs(annotations, ...args) {
-        return injectArgs(annotations, ...args);
-    }
-    createAgent(annotations, methodAnnotations, agent) {
-        return (resolve = (value) => value, ...args) => {
-            let value;
-            const _agent = () => value = agent(...!annotations.length ? args : this.injectArgs(annotations, ...args));
-            const end = (result) => resolve(result ? _agent() : undefined);
-            this.methodIntercept(methodAnnotations, end, ...args);
-            return value;
-        };
-    }
-    proxyMethod(type, method) {
-        const agent = this._proxyMethod(type, method);
-        return (...args) => agent(undefined, ...args);
-    }
-    proxyMethodAsync(type, method) {
-        return this._proxyMethod(type, method);
+            return agent;
+        const native = (_a = ctor[NATIVE_METHOD]) !== null && _a !== void 0 ? _a : {};
+        const proxy = this.createAgent(type, method, native[method] || agent);
+        if (native[method])
+            native[method] = proxy;
+        return native[method] ? agent : proxy;
     }
 };
-MethodProxy.skipMethodFlag = skipMethodFlag;
+__decorate([
+    Inject(Injector),
+    __metadata("design:type", StaticInjector)
+], MethodProxy.prototype, "injector", void 0);
 MethodProxy = __decorate([
     Injectable()
 ], MethodProxy);

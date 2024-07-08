@@ -2,6 +2,7 @@ import { __spreadArray } from "tslib";
 export var ANNOTATIONS = '__annotations__';
 export var PARAMETERS = '__parameters__';
 export var METHODS = '__methods__';
+export var NATIVE_METHOD = '__native__method__';
 export var PROP_METADATA = '__prop__metadata__';
 function hasOwnProperty(object, v) {
     return Object.prototype.hasOwnProperty.call(object, v);
@@ -81,6 +82,17 @@ export function makeMethodDecorator(name, props, typeFn) {
         return function MethodDecorator(_a, method, descriptor) {
             var ctor = _a.constructor;
             var methods = getPropertyValue(ctor, METHODS);
+            var native = getPropertyValue(ctor, NATIVE_METHOD, {});
+            if (!native[method]) {
+                native[method] = descriptor.value;
+                descriptor.value = function () {
+                    var args = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        args[_i] = arguments[_i];
+                    }
+                    return native[method].apply(this, args);
+                };
+            }
             methods.push({ method: method, descriptor: descriptor, annotationInstance: annotationInstance });
             typeFn && typeFn.apply(void 0, __spreadArray([ctor, method, descriptor], args, false));
         };

@@ -1,6 +1,7 @@
 export const ANNOTATIONS = '__annotations__';
 export const PARAMETERS = '__parameters__';
 export const METHODS = '__methods__';
+export const NATIVE_METHOD = '__native__method__';
 export const PROP_METADATA = '__prop__metadata__';
 function hasOwnProperty(object, v) {
     return Object.prototype.hasOwnProperty.call(object, v);
@@ -59,6 +60,11 @@ export function makeMethodDecorator(name, props, typeFn) {
         const annotationInstance = new MethodDecoratorFactory(...args);
         return function MethodDecorator({ constructor: ctor }, method, descriptor) {
             const methods = getPropertyValue(ctor, METHODS);
+            const native = getPropertyValue(ctor, NATIVE_METHOD, {});
+            if (!native[method]) {
+                native[method] = descriptor.value;
+                descriptor.value = function (...args) { return native[method].apply(this, args); };
+            }
             methods.push({ method, descriptor, annotationInstance });
             typeFn && typeFn(ctor, method, descriptor, ...args);
         };
