@@ -14,14 +14,14 @@
 			"default": "./esm5/index.js"
 		}
 	},
-	"dependencies": {
-		"reflect-metadata": "^0.2.1"
-	},
 	"scripts": {
 		"test": "echo 'Error: no test specified' && exit 1"
 	},
 	"author": "",
 	"license": "ISC",
+	"dependencies": {
+		"reflect-metadata": "^0.2.2"
+	},
 	"sideEffects": [
 		"*.effects.js"
 	]
