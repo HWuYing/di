@@ -37,10 +37,15 @@ var ReflectionCapabilities = /** @class */ (function () {
         });
         return paramAnnotations;
     };
-    ReflectionCapabilities.prototype.getMethodAnnotations = function (type, methodName) {
+    ReflectionCapabilities.prototype.getMethodAnnotations = function (type, methodName, metaNames) {
         var metadata = type.hasOwnProperty(METHODS) && type[METHODS] || [];
         var methodAnnotations = [];
-        metadata.forEach(function (item) { return item.method === methodName && methodAnnotations.unshift(item); });
+        metadata.forEach(function (_a) {
+            var method = _a.method, annotationInstance = _a.annotationInstance;
+            if (method === methodName && (!metaNames || metaNames.includes(annotationInstance.metadataName))) {
+                methodAnnotations.unshift(annotationInstance);
+            }
+        });
         return methodAnnotations;
     };
     ReflectionCapabilities.prototype.getPropAnnotations = function (type, propName) {
@@ -48,7 +53,9 @@ var ReflectionCapabilities = /** @class */ (function () {
         var propAnnotations = [];
         metadata.forEach(function (_a) {
             var prop = _a.prop, annotationInstance = _a.annotationInstance;
-            return prop === propName && propAnnotations.push(annotationInstance);
+            if (prop === propName) {
+                propAnnotations.push(annotationInstance);
+            }
         });
         return propAnnotations;
     };

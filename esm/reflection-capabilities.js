@@ -33,16 +33,24 @@ class ReflectionCapabilities {
         });
         return paramAnnotations;
     }
-    getMethodAnnotations(type, methodName) {
+    getMethodAnnotations(type, methodName, metaNames) {
         const metadata = type.hasOwnProperty(METHODS) && type[METHODS] || [];
         const methodAnnotations = [];
-        metadata.forEach((item) => item.method === methodName && methodAnnotations.unshift(item));
+        metadata.forEach(({ method, annotationInstance }) => {
+            if (method === methodName && (!metaNames || metaNames.includes(annotationInstance.metadataName))) {
+                methodAnnotations.unshift(annotationInstance);
+            }
+        });
         return methodAnnotations;
     }
     getPropAnnotations(type, propName) {
         const metadata = type.hasOwnProperty(PROP_METADATA) && type[PROP_METADATA] || [];
         const propAnnotations = [];
-        metadata.forEach(({ prop, annotationInstance }) => prop === propName && propAnnotations.push(annotationInstance));
+        metadata.forEach(({ prop, annotationInstance }) => {
+            if (prop === propName) {
+                propAnnotations.push(annotationInstance);
+            }
+        });
         return propAnnotations;
     }
     parameters(type) {

@@ -5,7 +5,7 @@ declare class ReflectionCapabilities {
     getPropMetadataValue(target: Type, propertyKey: string): any;
     getAnnotation<T = any>(type: Type, metadataName: string): T | null;
     getParamAnnotations<T = any>(type: Type, methodName: string): T[];
-    getMethodAnnotations<T = any>(type: Type, methodName: string): T[];
+    getMethodAnnotations<T = any>(type: Type, methodName: string, metaNames?: string[]): T[];
     getPropAnnotations<T = any>(type: Type, propName: string): T[];
     parameters(type: Type): any[];
     properties(type: Type): any;
